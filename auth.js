@@ -73,17 +73,15 @@ function requireAuth() {
 // يتطلب دوراً محدداً (student / teacher / supervisor)
 function requireRole(role) {
   const s = getSession();
-  if (!s) {
-    window.location.replace('index.html');
-    return null;
-  }
-  if (s.role !== role) {
+  if (!s) { window.location.replace('index.html'); return null; }
+  
+  const allowed = Array.isArray(role) ? role : [role];
+  if (!allowed.includes(s.role)) {
     window.location.replace(getRoleHome(s.role));
     return null;
   }
   return s;
 }
-
 // إذا كان المستخدم مسجلاً بالفعل — وجّهه لصفحته (تُستخدم في index.html فقط)
 function redirectIfLoggedIn() {
   const s = getSession();
