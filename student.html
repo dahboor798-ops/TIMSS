@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة الطالب — TIMSS 2027</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* === تخصيص لوحة الطالب — مضغوط مع تمرير طبيعي === */
+header { padding: 10px 4%; }
+.logo { font-size: 17px; }
+header .sub { font-size: 11px; }
+
+main { padding: 10px 14px; margin: 0 auto; max-width: 1050px; width: 100%; }
+main .panel { padding: 14px; margin-bottom: 10px; }
+
+.panel-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px; flex-wrap: wrap; gap: 8px;
+}
+.panel-head h2 { margin: 0; font-size: 16px; }
+
+.student-info {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; margin-bottom: 8px;
+}
+.student-info .stat { padding: 8px 10px; }
+.student-info .stat span { font-size: 10px; }
+.student-info .stat b { font-size: 13px; margin-top: 2px; }
+
+main .form-box { padding: 12px; margin-top: 10px; }
+main .form-box .field { margin: 6px 0; font-size: 12px; }
+main .form-box input { padding: 8px 10px; font-size: 13px; }
+
+main .actions { margin-top: 10px; gap: 6px; }
+main .actions button { padding: 9px 14px; font-size: 13px; }
+
+.subject-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.subject-grid .subject-card { padding: 14px; }
+.subject-grid .icon-large { font-size: 30px; margin-bottom: 6px; }
+.subject-grid h3 { font-size: 15px; margin: 0 0 4px; }
+.subject-grid .small { font-size: 11px; margin-bottom: 8px; }
+.subject-grid .exam-action-btn { padding: 10px; font-size: 13px; }
+
+.reports-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;
+}
+.reports-grid button { padding: 10px; font-size: 13px; }
+
+footer { padding: 8px; font-size: 10px; }
+
+@media (max-width: 700px) {
+  .student-info, .subject-grid, .reports-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">منصة تدريب TIMSS 2027</div>
+    <div class="sub">لوحة الطالب</div>
+  </div>
+  <div class="sub" id="headerName">—</div>
+</header>
+
+<div class="nav-bar">
+  <span class="nav-label">التنقل السريع</span>
+  <div class="nav-btns">
+    <button class="nav-btn back" onclick="navBack()">⬅ رجوع</button>
+    <button class="nav-btn exit" onclick="logout()">🚪 خروج</button>
+  </div>
+</div>
+
+<main>
+  <!-- بيانات الطالب -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>بيانات الطالب</h2>
+      <button class="secondary" id="editStudentBtn" style="padding:4px 10px;font-size:11px">✏️ تعديل</button>
+    </div>
+    <div class="student-info">
+      <div class="stat"><span>اسم الطالب</span><b id="studentName">—</b></div>
+      <div class="stat"><span>المدرسة</span><b id="schoolName">—</b></div>
+      <div class="stat"><span>الصف والشعبة</span><b id="gradeSec">—</b></div>
+    </div>
+
+    <div id="studentEditForm" class="hidden">
+      <div class="form-box">
+        <h3 style="margin-top:0;font-size:14px">تعديل بياناتي</h3>
+        <div class="grid2">
+          <label class="field">الرقم الوطني (ثابت)<input id="std_editId" type="text" disabled></label>
+          <label class="field">رقم المدرسة (ثابت)<input id="std_editSchool" type="text" disabled></label>
+          <label class="field">الاسم الكامل<input id="std_editName" type="text"></label>
+          <label class="field">الصف<input id="std_editGrade" type="text"></label>
+          <label class="field">الشعبة<input id="std_editSection" type="text"></label>
+          <label class="field">رقم الهاتف<input id="std_editPhone" type="text"></label>
+        </div>
+        <div class="actions">
+          <button class="primary" id="saveStudentBtn">💾 حفظ</button>
+          <button class="secondary" id="cancelStudentBtn">إلغاء</button>
+        </div>
+        <div id="studentMsg" class="hidden" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- اختيار المادة -->
+  <section class="panel">
+    <h2 style="margin-top:0;font-size:16px">اختر المادة للامتحان</h2>
+    <p class="muted" style="margin-bottom:10px;font-size:12px">
+      كل جلسة: 40 سؤالاً — 45 دقيقة.
+    </p>
+
+    <div class="subject-grid">
+      <div class="subject-card">
+        <div class="icon-large">📐</div>
+        <h3>الرياضيات</h3>
+        <div class="small">أعداد · جبر · هندسة · بيانات</div>
+        <button class="exam-action-btn" onclick="goToExam('math')">🚀 ابدأ</button>
+      </div>
+      <div class="subject-card">
+        <div class="icon-large">🔬</div>
+        <h3>العلوم</h3>
+        <div class="small">أحياء · فيزياء · كيمياء · أرض</div>
+        <button class="exam-action-btn" style="background:linear-gradient(135deg,#18845d,#136b4a)" onclick="goToExam('science')">🚀 ابدأ</button>
+      </div>
+    </div>
+
+    <hr style="margin:12px 0;border:0;border-top:1px solid var(--line)">
+
+    <h3 style="margin:0 0 8px;font-size:14px">📊 تقارير الأداء</h3>
+    <div class="reports-grid">
+      <button class="report-action-btn" onclick="goToReport('math')">📐 تقرير الرياضيات</button>
+      <button class="report-action-btn" onclick="goToReport('science')">🔬 تقرير العلوم</button>
+    </div>
+  </section>
+</main>
+
+<div class="nav-bar bottom">
+  <span class="nav-label">التنقل السريع</span>
+  <div class="nav-btns">
+    <button class="nav-btn back" onclick="navBack()">⬅ رجوع</button>
+    <button class="nav-btn exit" onclick="logout()">🚪 خروج</button>
+  </div>
+</div>
+
+<footer>منصة تدريبية مستقلة مستلهمة من إطار TIMSS.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  if (typeof supabase === 'undefined') {
+    document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
+  }
+</script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+
+const session = requireRole('student');
+if (!session) { throw new Error('redirecting'); }
+const student = session.data;
+
+function fillInfo() {
+  $('headerName').textContent = student.full_name || student.national_id;
+  $('studentName').textContent = student.full_name || '—';
+  $('schoolName').textContent = student.schools?.school_name || '—';
+  $('gradeSec').textContent = (student.grade || '—') + ' - ' + (student.section || '—');
+  $('std_editId').value = student.national_id;
+  $('std_editSchool').value = student.school_id;
+  $('std_editName').value = student.full_name || '';
+  $('std_editGrade').value = student.grade || '';
+  $('std_editSection').value = student.section || '';
+  $('std_editPhone').value = student.phone || '';
+}
+fillInfo();
+
+function setMsg(el, text, kind) {
+  el.className = kind || 'warning';
+  el.textContent = text;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 4000);
+}
+
+$('editStudentBtn').addEventListener('click', () => $('studentEditForm').classList.toggle('hidden'));
+$('cancelStudentBtn').addEventListener('click', () => $('studentEditForm').classList.add('hidden'));
+
+$('saveStudentBtn').addEventListener('click', async () => {
+  const msgBox = $('studentMsg');
+  const btn = $('saveStudentBtn');
+  const newName = $('std_editName').value.trim();
+  const newGrade = $('std_editGrade').value.trim();
+  const newSection = $('std_editSection').value.trim();
+  const newPhone = $('std_editPhone').value.trim();
+
+  if (!newName || !newGrade) { setMsg(msgBox, '⚠️ الاسم والصف مطلوبان', 'error'); return; }
+
+  btn.disabled = true; btn.textContent = '⏳...';
+
+  try {
+    const res = await window.db.from('students').update({
+      full_name: newName,
+      grade: newGrade,
+      section: newSection || null,
+      phone: newPhone || null
+    }).eq('national_id', student.national_id);
+    if (res.error) throw res.error;
+
+    student.full_name = newName;
+    student.grade = newGrade;
+    student.section = newSection;
+    student.phone = newPhone;
+    saveSession('student', student);
+
+    fillInfo();
+    setMsg(msgBox, '✅ تم التحديث', 'success');
+    setTimeout(() => $('studentEditForm').classList.add('hidden'), 1200);
+  } catch (err) {
+    setMsg(msgBox, '❌ ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '💾 حفظ';
+  }
+});
+
+function goToExam(subject) {
+  if (!['math', 'science'].includes(subject)) return;
+  const subjectAr = subject === 'math' ? 'الرياضيات' : 'العلوم';
+  if (!confirm('🚀 بدء امتحان ' + subjectAr + '\n\n⏱ 45 دقيقة\n📝 40 سؤالاً\n\nهل أنت جاهز؟')) return;
+  window.location.href = 'exam.html?subject=' + encodeURIComponent(subject)
+    + '&sid=' + encodeURIComponent(student.national_id);
+}
+
+function goToReport(subject) {
+  if (!['math', 'science'].includes(subject)) return;
+  window.location.href = 'report.html?mode=student&subject=' + encodeURIComponent(subject)
+    + '&sid=' + encodeURIComponent(student.national_id);
+}
+</script>
+</body>
+</html>

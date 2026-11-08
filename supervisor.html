@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة المشرف — TIMSS 2027</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+header { padding: 10px 4%; }
+.logo { font-size: 17px; }
+header .sub { font-size: 11px; }
+
+main { padding: 10px 14px; margin: 0 auto; max-width: 1050px; width: 100%; }
+main .panel { padding: 14px; margin-bottom: 10px; }
+
+.panel-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px; flex-wrap: wrap; gap: 8px;
+}
+.panel-head h2 { margin: 0; font-size: 16px; }
+
+.supervisor-info {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; margin-bottom: 8px;
+}
+.supervisor-info .stat { padding: 8px 10px; }
+.supervisor-info .stat span { font-size: 10px; }
+.supervisor-info .stat b { font-size: 13px; margin-top: 2px; }
+
+main .tabs { margin-bottom: 10px; }
+main .tab-btn { padding: 8px; font-size: 13px; }
+
+.add-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.add-cards .subject-card { padding: 14px; cursor: pointer; }
+.add-cards .subject-card h3 { font-size: 14px; margin: 0 0 3px; }
+.add-cards .subject-card p { font-size: 11px; }
+
+main .form-box { padding: 12px; margin-top: 10px; }
+main .form-box .field { margin: 6px 0; font-size: 12px; }
+main .form-box input, main .form-box select { padding: 8px 10px; font-size: 13px; }
+
+main .actions { margin-top: 10px; gap: 6px; }
+main .actions button { padding: 9px 14px; font-size: 13px; }
+
+#supSchoolContent .school-block {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+#supSchoolContent .school-block h4 {
+  margin: 0 0 8px; color: var(--navy); font-size: 14px;
+}
+
+main .list-item { padding: 8px 10px; font-size: 12px; margin-bottom: 6px; }
+main .info-box { padding: 12px; margin-top: 10px; }
+main .info-box .stat { padding: 8px; }
+main .info-box .stat span { font-size: 10px; }
+main .info-box .stat b { font-size: 12px; }
+
+.report-step-title {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--navy);
+}
+.report-step-title.with-actions {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 6px;
+}
+
+.report-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.report-tabs button {
+  padding: 6px 12px; font-size: 11px;
+  background: rgba(255,255,255,.15); color: #fff;
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 6px; cursor: pointer;
+  font-weight: 700; transition: .15s;
+}
+.report-tabs button:hover { background: rgba(255,255,255,.3); }
+.report-tabs button.active {
+  background: #fff; color: var(--navy); border-color: #fff;
+}
+
+footer { padding: 8px; font-size: 10px; }
+
+@media (max-width: 700px) {
+  .supervisor-info, .add-cards { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">منصة تدريب TIMSS 2027</div>
+    <div class="sub">لوحة المشرف</div>
+  </div>
+  <div class="sub" id="headerName">—</div>
+</header>
+
+<div class="nav-bar">
+  <span class="nav-label">التنقل السريع</span>
+  <div class="nav-btns">
+    <button class="nav-btn back" onclick="navBack()">⬅ رجوع</button>
+    <button class="nav-btn exit" onclick="logout()">🚪 خروج</button>
+  </div>
+</div>
+
+<main>
+  <section class="panel">
+    <div class="panel-head">
+      <h2>لوحة تحكم المشرف</h2>
+      <button class="secondary" id="editSuperBtn" style="padding:4px 10px;font-size:11px">✏️ تعديل</button>
+    </div>
+    <div class="supervisor-info">
+      <div class="stat"><span>اسم المشرف</span><b id="superName">—</b></div>
+      <div class="stat"><span>المديرية</span><b id="superDirectorate">—</b></div>
+      <div class="stat"><span>التخصص</span><b id="superSpec">—</b></div>
+    </div>
+
+    <div id="superEditForm" class="hidden">
+      <div class="form-box">
+        <h3 style="margin-top:0;font-size:14px">تعديل بياناتي</h3>
+        <div class="grid2">
+          <label class="field">الرقم الوطني<input id="sup_editId" type="text" disabled></label>
+          <label class="field">رقم المديرية<input id="sup_editDir" type="text" disabled></label>
+          <label class="field">الاسم الكامل<input id="sup_editName" type="text"></label>
+          <label class="field">رقم الهاتف<input id="sup_editPhone" type="text"></label>
+          <label class="field">التخصص<input id="sup_editSpec" type="text"></label>
+        </div>
+        <div class="actions">
+          <button class="primary" id="saveSuperBtn">💾 حفظ</button>
+          <button class="secondary" id="cancelSuperBtn">إلغاء</button>
+        </div>
+        <div id="superMsg" class="hidden" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="supTabAdd">➕ إضافة</button>
+    <button class="tab-btn" id="supTabView">🗂️ استعراض وحذف</button>
+    <button class="tab-btn" id="supTabReports">📊 تقارير</button>
+  </div>
+
+  <!-- ============ تبويب الإضافة ============ -->
+  <div id="superAddSection" class="panel">
+    <div id="supAddOptions" class="add-cards">
+      <div class="subject-card" onclick="showSupForm('sch')">
+        <h3>🏫 مدرسة</h3>
+        <p class="muted" style="margin:0">إضافة مدرسة</p>
+      </div>
+      <div class="subject-card" onclick="showSupForm('tch')">
+        <h3>👨‍🏫 معلم</h3>
+        <p class="muted" style="margin:0">إضافة معلم</p>
+      </div>
+      <div class="subject-card" onclick="showSupForm('sup')">
+        <h3>👨‍💼 مشرف</h3>
+        <p class="muted" style="margin:0">إضافة مشرف</p>
+      </div>
+    </div>
+
+    <div id="supFormSchool" class="hidden">
+      <button class="secondary" onclick="hideSupForms()" style="margin-bottom:10px">⬅ رجوع</button>
+      <h3 style="font-size:15px">🏫 إضافة مدرسة</h3>
+      <div class="form-box">
+        <label class="field">المديرية<input id="add_sch_dir_name" type="text" disabled></label>
+        <div class="grid2">
+          <label class="field">رقم المدرسة<input id="add_sch_code" type="text" inputmode="numeric"></label>
+          <label class="field">اسم المدرسة<input id="add_sch_name" type="text"></label>
+          <label class="field">الجنس
+            <select id="add_sch_gender">
+              <option value="بنين">بنين</option>
+              <option value="بنات">بنات</option>
+            </select>
+          </label>
+          <label class="field">نوع المدرسة<input id="add_sch_type" type="text"></label>
+        </div>
+        <div class="actions"><button class="primary" id="addSchoolBtn">➕ إضافة</button></div>
+        <div id="addSchoolMsg" class="hidden" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div id="supFormTeacher" class="hidden">
+      <button class="secondary" onclick="hideSupForms()" style="margin-bottom:10px">⬅ رجوع</button>
+      <h3 style="font-size:15px">👨‍🏫 إضافة معلم</h3>
+      <div class="form-box">
+        <div class="grid2">
+          <label class="field">الرقم الوطني<input id="add_t_id" type="text" inputmode="numeric"></label>
+          <label class="field">الاسم الكامل<input id="add_t_name" type="text"></label>
+          <label class="field">المدرسة
+            <select id="add_t_school" onchange="updateSchoolName()">
+              <option value="">جارٍ التحميل...</option>
+            </select>
+          </label>
+          <label class="field">اسم المدرسة<input id="add_t_school_name" type="text" disabled></label>
+          <label class="field">المادة<input id="add_t_spec" type="text"></label>
+          <label class="field">الهاتف<input id="add_t_phone" type="text" inputmode="tel"></label>
+        </div>
+        <div class="actions"><button class="primary" id="addTeacherBtn">➕ إضافة</button></div>
+        <div id="addTeacherMsg" class="hidden" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div id="supFormSupervisor" class="hidden">
+      <button class="secondary" onclick="hideSupForms()" style="margin-bottom:10px">⬅ رجوع</button>
+      <h3 style="font-size:15px">👨‍💼 إضافة مشرف</h3>
+      <div class="form-box">
+        <label class="field">المديرية<input id="add_sup_dir_name" type="text" disabled></label>
+        <div class="grid2">
+          <label class="field">الرقم الوطني<input id="add_sup_id" type="text" inputmode="numeric"></label>
+          <label class="field">الاسم الكامل<input id="add_sup_name" type="text"></label>
+          <label class="field">التخصص<input id="add_sup_spec" type="text"></label>
+          <label class="field">الهاتف<input id="add_sup_phone" type="text" inputmode="tel"></label>
+        </div>
+        <div class="actions"><button class="primary" id="addSupervisorBtn">➕ إضافة</button></div>
+        <div id="addSupervisorMsg" class="hidden" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ تبويب الاستعراض ============ -->
+  <div id="superViewSection" class="panel hidden">
+    <h3 style="margin-top:0;font-size:15px">🗂️ استعراض مدارس المديرية</h3>
+    <div class="form-box">
+      <label class="field">🏫 اختر المدرسة
+        <select id="sup_view_school" onchange="loadSupSchoolSelection()">
+          <option value="">جارٍ التحميل...</option>
+        </select>
+      </label>
+      <div class="actions" style="margin-top:0">
+        <button class="danger hidden" id="sup_delete_school_btn">🗑️ حذف المدرسة</button>
+      </div>
+    </div>
+
+    <div id="supSchoolContent" class="hidden">
+      <div class="school-block">
+        <h4>👨‍🏫 معلمو المدرسة (<span id="supTeacherCount">0</span>)</h4>
+        <label class="field">اختر المعلم
+          <select id="sup_view_teacher" onchange="showSupTeacherInfo()">
+            <option value="">-- اختر --</option>
+          </select>
+        </label>
+        <div class="info-box hidden" id="supTeacherInfoBox">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h4 style="margin:0;color:var(--blue);font-size:13px">بيانات المعلم</h4>
+            <button class="secondary" onclick="document.getElementById('supTeacherInfoBox').classList.add('hidden')" style="padding:3px 8px;font-size:11px">إغلاق ✖</button>
+          </div>
+          <hr style="border:0;border-top:1px solid #cbd5e1;margin:8px 0">
+          <div class="grid3">
+            <div class="stat"><span>الاسم</span><b id="sup_info_t_name">—</b></div>
+            <div class="stat"><span>الرقم الوطني</span><b id="sup_info_t_id">—</b></div>
+            <div class="stat"><span>المادة</span><b id="sup_info_t_subject">—</b></div>
+            <div class="stat"><span>الهاتف</span><b id="sup_info_t_phone">—</b></div>
+          </div>
+          <div class="actions"><button class="danger" id="sup_del_teacher_btn">🗑️ حذف</button></div>
+        </div>
+      </div>
+
+      <div class="school-block">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+          <h4 style="margin:0">👨‍🎓 طلاب المدرسة (<span id="supStudentCount">0</span>)</h4>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="report-action-btn" onclick="openSchoolReport('math')" style="padding:6px 10px;font-size:11px">📐 تقرير رياضيات</button>
+            <button class="report-action-btn" onclick="openSchoolReport('science')" style="padding:6px 10px;font-size:11px">🔬 تقرير علوم</button>
+          </div>
+        </div>
+        <label class="field">اختر الشعبة
+          <select id="sup_view_section" onchange="loadSupSectionStudents()">
+            <option value="all">جميع الشعب</option>
+          </select>
+        </label>
+        <div class="info-box hidden" id="supStudentInfoBox">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h4 style="margin:0;color:var(--blue);font-size:13px">بيانات الطالب</h4>
+            <button class="secondary" onclick="document.getElementById('supStudentInfoBox').classList.add('hidden')" style="padding:3px 8px;font-size:11px">إغلاق ✖</button>
+          </div>
+          <hr style="border:0;border-top:1px solid #cbd5e1;margin:8px 0">
+          <div class="grid3">
+            <div class="stat"><span>الاسم</span><b id="sup_info_s_name">—</b></div>
+            <div class="stat"><span>الرقم الوطني</span><b id="sup_info_s_id">—</b></div>
+            <div class="stat"><span>الصف والشعبة</span><b id="sup_info_s_grade">—</b></div>
+            <div class="stat"><span>الهاتف</span><b id="sup_info_s_phone">—</b></div>
+          </div>
+        </div>
+        <div class="report-box hidden" id="supStudentReportBox">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h4 style="margin:0;color:var(--green);font-size:13px">📊 تقرير: <span id="sup_rep_s_name"></span></h4>
+            <button class="secondary" onclick="document.getElementById('supStudentReportBox').classList.add('hidden')" style="padding:3px 8px;font-size:11px">إغلاق ✖</button>
+          </div>
+          <hr style="border:0;border-top:1px solid #bbf7d0;margin:8px 0">
+          <div class="grid2">
+            <button class="report-action-btn" onclick="openStudentReport('math')" style="padding:8px;font-size:12px">📐 الرياضيات</button>
+            <button class="report-action-btn" onclick="openStudentReport('science')" style="padding:8px;font-size:12px">🔬 العلوم</button>
+          </div>
+        </div>
+        <div id="supStudentsList" class="muted" style="margin-top:8px">لا يوجد طلاب بعد.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ تبويب التقارير ============ -->
+  <div id="superReportSection" class="panel hidden">
+    <h3 style="margin-top:0;font-size:15px">📊 تقارير المدارس</h3>
+    <div class="form-box">
+      <label class="field">🏫 1️⃣ اختر المدرسة
+        <select id="rep_sch_select" onchange="onSupReportSchoolChange()">
+          <option value="">جارٍ التحميل...</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="supReportOptionsBox" class="form-box hidden" style="border:2px solid var(--blue);background:#f0f7ff">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <h4 id="supReportSchoolName" style="margin:0;color:var(--blue);font-size:14px">🏫 —</h4>
+        <button class="secondary" onclick="cancelSupReportOptions()" style="padding:4px 8px;font-size:11px">✖ إلغاء</button>
+      </div>
+
+      <div class="report-step-title">2️⃣ اختر المواد</div>
+      <div class="sections-checklist" id="sup_report_subjects_list">
+        <label class="checked">
+          <input type="checkbox" value="math" checked />
+          <span>📐 الرياضيات</span>
+        </label>
+        <label class="checked">
+          <input type="checkbox" value="science" checked />
+          <span>🔬 العلوم</span>
+        </label>
+      </div>
+
+      <div class="report-step-title with-actions">
+        <span>3️⃣ اختر الشعب</span>
+        <div style="display:flex;gap:4px">
+          <button class="secondary" onclick="toggleAllSections('sup_report_sections_list', true)" style="padding:4px 10px;font-size:11px">✔️ تحديد الكل</button>
+          <button class="secondary" onclick="toggleAllSections('sup_report_sections_list', false)" style="padding:4px 10px;font-size:11px">✖️ إلغاء الكل</button>
+        </div>
+      </div>
+      <div class="sections-checklist" id="sup_report_sections_list">
+        <div class="muted" style="grid-column:1/-1">جارٍ التحميل...</div>
+      </div>
+
+      <div class="actions" style="margin-top:12px">
+        <button class="report-action-btn" style="padding:10px 20px;font-size:13px" onclick="generateSupReport()">📊 عرض التقارير</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="nav-bar bottom">
+  <span class="nav-label">التنقل السريع</span>
+  <div class="nav-btns">
+    <button class="nav-btn back" onclick="navBack()">⬅ رجوع</button>
+    <button class="nav-btn exit" onclick="logout()">🚪 خروج</button>
+  </div>
+</div>
+
+<footer>منصة تدريبية مستقلة مستلهمة من إطار TIMSS.</footer>
+
+<section id="embeddedReportSection" class="hidden">
+  <div class="embedded-report-bar">
+    <div class="info">
+      <b id="embeddedReportTitle">📊 تقرير</b>
+      <span id="embeddedReportSubtitle">—</span>
+    </div>
+    <div class="btns">
+      <div class="report-tabs hidden" id="reportTabs"></div>
+      <button class="back" onclick="closeEmbeddedReport()">⬅ رجوع</button>
+      <button class="newtab" onclick="openInNewTab()">🔗 نافذة جديدة</button>
+    </div>
+  </div>
+  <iframe id="embeddedReportFrame" src="about:blank" title="التقرير"></iframe>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  if (typeof supabase === 'undefined') {
+    document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
+  }
+</script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+
+const session = requireRole('supervisor');
+if (!session) { throw new Error('redirecting'); }
+
+const supervisor = session.data;
+const dirId = supervisor.directorate_id;
+const dirName = supervisor.directorates?.directorate_name || 'غير معروف';
+
+const supViewState = {
+  dirId, schoolCode: null, schoolName: null,
+  teachers: [], students: [], schools: []
+};
+
+let __reportsList = [];
+let __activeReportIdx = 0;
+let __supSelectedStudentId = null;
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+function setMsg(el, text, kind) {
+  el.className = kind || 'warning';
+  el.textContent = text;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 4500);
+}
+
+// ============================================================
+// بيانات المشرف
+// ============================================================
+function fillSupervisorInfo() {
+  $('headerName').textContent = supervisor.full_name || supervisor.national_id;
+  $('superName').textContent = supervisor.full_name || '—';
+  $('superDirectorate').textContent = dirName;
+  $('superSpec').textContent = supervisor.specialization || '—';
+  $('sup_editId').value = supervisor.national_id;
+  $('sup_editDir').value = dirId;
+  $('sup_editName').value = supervisor.full_name || '';
+  $('sup_editPhone').value = supervisor.phone || '';
+  $('sup_editSpec').value = supervisor.specialization || '';
+  $('add_sch_dir_name').value = dirName;
+  $('add_sup_dir_name').value = dirName;
+}
+fillSupervisorInfo();
+
+// ============================================================
+// المدارس
+// ============================================================
+async function loadSchools() {
+  const res = await window.db.from('schools')
+    .select('national_code, school_name')
+    .eq('directorate_id', dirId)
+    .order('school_name');
+  if (res.error) { console.error('loadSchools:', res.error); return []; }
+  supViewState.schools = res.data || [];
+  return supViewState.schools;
+}
+
+function populateSchoolDropdowns(schools) {
+  const html = !schools.length
+    ? '<option value="">لا توجد مدارس مسجلة</option>'
+    : '<option value="">-- اختر المدرسة --</option>' +
+      schools.map(s => `<option value="${escapeHtml(s.national_code)}" data-name="${escapeHtml(s.school_name)}">${escapeHtml(s.school_name)} (${s.national_code})</option>`).join('');
+  ['add_t_school', 'sup_view_school', 'rep_sch_select'].forEach(id => {
+    const el = $(id);
+    if (el) el.innerHTML = html;
+  });
+  $('add_t_school_name').value = '';
+}
+
+async function refreshSchools() {
+  const schools = await loadSchools();
+  populateSchoolDropdowns(schools);
+}
+refreshSchools();
+
+// ============================================================
+// تعديل البيانات
+// ============================================================
+$('editSuperBtn').addEventListener('click', () => $('superEditForm').classList.toggle('hidden'));
+$('cancelSuperBtn').addEventListener('click', () => $('superEditForm').classList.add('hidden'));
+
+$('saveSuperBtn').addEventListener('click', async () => {
+  const msgBox = $('superMsg');
+  const btn = $('saveSuperBtn');
+  const newName = $('sup_editName').value.trim();
+  const newPhone = $('sup_editPhone').value.trim();
+  const newSpec = $('sup_editSpec').value.trim();
+  if (!newName) { setMsg(msgBox, '⚠️ الاسم مطلوب', 'error'); return; }
+  btn.disabled = true; btn.textContent = '⏳...';
+  try {
+    const res = await window.db.from('supervisors').update({
+      full_name: newName,
+      phone: newPhone || null,
+      specialization: newSpec || null
+    }).eq('national_id', supervisor.national_id);
+    if (res.error) throw res.error;
+    supervisor.full_name = newName;
+    supervisor.phone = newPhone;
+    supervisor.specialization = newSpec;
+    saveSession('supervisor', supervisor);
+    fillSupervisorInfo();
+    setMsg(msgBox, '✅ تم التحديث', 'success');
+    setTimeout(() => $('superEditForm').classList.add('hidden'), 1200);
+  } catch (err) {
+    setMsg(msgBox, '❌ ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '💾 حفظ';
+  }
+});
+
+// ============================================================
+// ✅ التبويبات — الإصلاح الرئيسي هنا
+// ============================================================
+const TAB_MAP = {
+  add:     { tab: 'supTabAdd',     section: 'superAddSection'    },
+  view:    { tab: 'supTabView',    section: 'superViewSection'   },
+  reports: { tab: 'supTabReports', section: 'superReportSection' }
+};
+
+$('supTabAdd').addEventListener('click', () => activateTab('add'));
+$('supTabView').addEventListener('click', () => activateTab('view'));
+$('supTabReports').addEventListener('click', () => activateTab('reports'));
+
+function activateTab(name) {
+  Object.keys(TAB_MAP).forEach(key => {
+    const active = key === name;
+    const tabEl = $(TAB_MAP[key].tab);
+    const secEl = $(TAB_MAP[key].section);
+    if (tabEl) tabEl.classList.toggle('active', active);
+    if (secEl) secEl.classList.toggle('hidden', !active);
+  });
+  if (name === 'add') hideSupForms();
+  if (name === 'view') {
+    // ضمان وجود قائمة المدارس
+    if (!supViewState.schools.length) refreshSchools();
+  }
+  if (name === 'reports') {
+    $('supReportOptionsBox').classList.add('hidden');
+    // ضمان وجود قائمة المدارس
+    if (!supViewState.schools.length) refreshSchools();
+  }
+}
+
+// ============================================================
+// تبويب الإضافة
+// ============================================================
+function showSupForm(type) {
+  $('supAddOptions').classList.add('hidden');
+  $('supFormSchool').classList.add('hidden');
+  $('supFormTeacher').classList.add('hidden');
+  $('supFormSupervisor').classList.add('hidden');
+  if (type === 'sch') $('supFormSchool').classList.remove('hidden');
+  if (type === 'tch') $('supFormTeacher').classList.remove('hidden');
+  if (type === 'sup') $('supFormSupervisor').classList.remove('hidden');
+}
+function hideSupForms() {
+  $('supAddOptions').classList.remove('hidden');
+  $('supFormSchool').classList.add('hidden');
+  $('supFormTeacher').classList.add('hidden');
+  $('supFormSupervisor').classList.add('hidden');
+}
+
+$('addSchoolBtn').addEventListener('click', async () => {
+  const msgBox = $('addSchoolMsg');
+  const btn = $('addSchoolBtn');
+  const code = $('add_sch_code').value.trim();
+  const name = $('add_sch_name').value.trim();
+  if (!code || !name) { setMsg(msgBox, '⚠️ رقم المدرسة والاسم مطلوبان', 'error'); return; }
+  const codeNum = parseInt(code, 10);
+  if (isNaN(codeNum)) { setMsg(msgBox, '⚠️ الرقم يجب أن يكون رقماً', 'error'); return; }
+  btn.disabled = true; btn.textContent = '⏳...';
+  try {
+    const res = await window.db.from('schools').insert([{
+      national_code: codeNum,
+      school_name: name,
+      directorate_id: dirId,
+      gender: $('add_sch_gender').value,
+      school_type: $('add_sch_type').value.trim() || null
+    }]);
+    if (res.error) throw res.error;
+    setMsg(msgBox, '✅ تمت الإضافة', 'success');
+    $('add_sch_code').value = ''; $('add_sch_name').value = ''; $('add_sch_type').value = '';
+    await refreshSchools();
+  } catch (err) {
+    setMsg(msgBox, '❌ ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '➕ إضافة';
+  }
+});
+
+async function updateSchoolName() {
+  const code = $('add_t_school').value;
+  if (!code) { $('add_t_school_name').value = ''; return; }
+  const sel = $('add_t_school');
+  $('add_t_school_name').value = sel.options[sel.selectedIndex].dataset.name || '';
+}
+
+$('addTeacherBtn').addEventListener('click', async () => {
+  const msgBox = $('addTeacherMsg');
+  const btn = $('addTeacherBtn');
+  const id = $('add_t_id').value.trim();
+  const name = $('add_t_name').value.trim();
+  const school = $('add_t_school').value;
+  if (!id || !name || !school) { setMsg(msgBox, '⚠️ الرقم والاسم والمدرسة مطلوبة', 'error'); return; }
+  btn.disabled = true; btn.textContent = '⏳...';
+  try {
+    const res = await window.db.from('teachers').insert([{
+      national_id: id,
+      full_name: name,
+      school_id: parseInt(school, 10),
+      subject: $('add_t_spec').value.trim() || null,
+      phone: $('add_t_phone').value.trim() || null
+    }]);
+    if (res.error) throw res.error;
+    setMsg(msgBox, '✅ تمت الإضافة', 'success');
+    $('add_t_id').value = ''; $('add_t_name').value = '';
+    $('add_t_school').value = ''; $('add_t_school_name').value = '';
+    $('add_t_spec').value = ''; $('add_t_phone').value = '';
+  } catch (err) {
+    setMsg(msgBox, '❌ ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '➕ إضافة';
+  }
+});
+
+$('addSupervisorBtn').addEventListener('click', async () => {
+  const msgBox = $('addSupervisorMsg');
+  const btn = $('addSupervisorBtn');
+  const id = $('add_sup_id').value.trim();
+  const name = $('add_sup_name').value.trim();
+  if (!id || !name) { setMsg(msgBox, '⚠️ الرقم والاسم مطلوبان', 'error'); return; }
+  btn.disabled = true; btn.textContent = '⏳...';
+  try {
+    const res = await window.db.from('supervisors').insert([{
+      national_id: id,
+      full_name: name,
+      directorate_id: dirId,
+      specialization: $('add_sup_spec').value.trim() || null,
+      phone: $('add_sup_phone').value.trim() || null
+    }]);
+    if (res.error) throw res.error;
+    setMsg(msgBox, '✅ تمت الإضافة', 'success');
+    $('add_sup_id').value = ''; $('add_sup_name').value = '';
+    $('add_sup_spec').value = ''; $('add_sup_phone').value = '';
+  } catch (err) {
+    setMsg(msgBox, '❌ ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '➕ إضافة';
+  }
+});
+
+// ============================================================
+// تبويب الاستعراض
+// ============================================================
+async function loadSupSchoolSelection() {
+  const sel = $('sup_view_school');
+  const code = sel.value;
+  if (!code) {
+    $('supSchoolContent').classList.add('hidden');
+    $('sup_delete_school_btn').classList.add('hidden');
+    supViewState.schoolCode = null;
+    return;
+  }
+  const opt = sel.options[sel.selectedIndex];
+  supViewState.schoolCode = code;
+  supViewState.schoolName = opt.dataset.name || '';
+  $('sup_delete_school_btn').classList.remove('hidden');
+  $('sup_delete_school_btn').onclick = () => deleteSchool(code);
+
+  const tRes = await window.db.from('teachers')
+    .select('national_id, full_name, subject, phone')
+    .eq('school_id', parseInt(code, 10))
+    .order('full_name');
+  supViewState.teachers = tRes.data || [];
+  const tSelect = $('sup_view_teacher');
+  if (!supViewState.teachers.length) {
+    tSelect.innerHTML = '<option value="">لا يوجد معلمون</option>';
+    $('supTeacherCount').textContent = '0';
+  } else {
+    tSelect.innerHTML = '<option value="">-- اختر --</option>' +
+      supViewState.teachers.map(t =>
+        `<option value="${escapeHtml(t.national_id)}">${escapeHtml(t.full_name)}${t.subject ? ' — ' + escapeHtml(t.subject) : ''}</option>`
+      ).join('');
+    $('supTeacherCount').textContent = supViewState.teachers.length;
+  }
+  $('supTeacherInfoBox').classList.add('hidden');
+
+  const sRes = await window.db.from('students')
+    .select('national_id, full_name, grade, section, phone')
+    .eq('school_id', parseInt(code, 10))
+    .order('full_name');
+  supViewState.students = sRes.data || [];
+  $('supStudentCount').textContent = supViewState.students.length;
+
+  const uniq = {};
+  supViewState.students.forEach(s => { if (s.section && s.section.trim()) uniq[s.section.trim()] = true; });
+  const sections = Object.keys(uniq).sort();
+  $('sup_view_section').innerHTML = '<option value="all">جميع الشعب</option>' +
+    sections.map(sec => `<option value="${escapeHtml(sec)}">شعبة ${escapeHtml(sec)}</option>`).join('');
+
+  $('supStudentInfoBox').classList.add('hidden');
+  $('supStudentReportBox').classList.add('hidden');
+  $('supSchoolContent').classList.remove('hidden');
+  renderSupStudents('all');
+}
+
+function renderSupStudents(filter) {
+  const list = $('supStudentsList');
+  const arr = (filter === 'all') ? supViewState.students : supViewState.students.filter(s => s.section === filter);
+  if (!arr.length) { list.innerHTML = '<div class="muted">لا يوجد طلاب.</div>'; return; }
+  list.innerHTML = arr.map((s, i) => `
+    <div class="list-item" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:5px">
+      <span><b>${i+1}. ${escapeHtml(s.full_name)}</b> (${escapeHtml(s.grade)} - ${escapeHtml(s.section || '—')})</span>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="secondary" style="padding:4px 8px;font-size:11px" onclick="showSupStudentInfo('${escapeHtml(s.national_id)}','${escapeHtml(s.full_name)}','${escapeHtml(s.grade)}','${escapeHtml(s.section || '—')}','${escapeHtml(s.phone || '—')}')">استعراض</button>
+        <button class="primary" style="padding:4px 8px;font-size:11px" onclick="showSupStudentReport('${escapeHtml(s.national_id)}','${escapeHtml(s.full_name)}')">تقرير</button>
+        <button class="danger" style="padding:4px 8px;font-size:11px" onclick="deleteStudent('${escapeHtml(s.national_id)}')">حذف</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadSupSectionStudents() { renderSupStudents($('sup_view_section').value); }
+
+function showSupTeacherInfo() {
+  const id = $('sup_view_teacher').value;
+  if (!id) { $('supTeacherInfoBox').classList.add('hidden'); return; }
+  const t = supViewState.teachers.find(x => x.national_id === id);
+  if (!t) return;
+  $('sup_info_t_name').textContent = t.full_name;
+  $('sup_info_t_id').textContent = t.national_id;
+  $('sup_info_t_subject').textContent = t.subject || '—';
+  $('sup_info_t_phone').textContent = t.phone || '—';
+  $('sup_del_teacher_btn').onclick = () => deleteTeacher(t.national_id);
+  $('supTeacherInfoBox').classList.remove('hidden');
+}
+
+function showSupStudentInfo(id, name, grade, section, phone) {
+  $('sup_info_s_name').textContent = name;
+  $('sup_info_s_id').textContent = id;
+  $('sup_info_s_grade').textContent = grade + ' - شعبة ' + section;
+  $('sup_info_s_phone').textContent = phone || '—';
+  __supSelectedStudentId = id;
+  $('supStudentReportBox').classList.add('hidden');
+  $('supStudentInfoBox').classList.remove('hidden');
+}
+
+function showSupStudentReport(id, name) {
+  $('sup_rep_s_name').textContent = name;
+  __supSelectedStudentId = id;
+  $('supStudentInfoBox').classList.add('hidden');
+  $('supStudentReportBox').classList.remove('hidden');
+}
+
+async function deleteSchool(code) {
+  if (!confirm('⚠️ هل أنت متأكد من حذف المدرسة؟')) return;
+  try {
+    const tRes = await window.db.from('teachers').select('national_id').eq('school_id', parseInt(code, 10)).limit(1);
+    const sRes = await window.db.from('students').select('national_id').eq('school_id', parseInt(code, 10)).limit(1);
+    if ((tRes.data && tRes.data.length) || (sRes.data && sRes.data.length)) {
+      alert('⚠️ لا يمكن الحذف — يوجد معلمون أو طلاب مرتبطون.');
+      return;
+    }
+    const res = await window.db.from('schools').delete().eq('national_code', parseInt(code, 10));
+    if (res.error) throw res.error;
+    alert('✅ تم حذف المدرسة');
+    $('sup_view_school').value = '';
+    $('supSchoolContent').classList.add('hidden');
+    $('sup_delete_school_btn').classList.add('hidden');
+    await refreshSchools();
+  } catch (err) { alert('❌ ' + (err.message || err)); }
+}
+
+async function deleteTeacher(id) {
+  if (!confirm('⚠️ حذف المعلم؟')) return;
+  try {
+    const res = await window.db.from('teachers').delete().eq('national_id', id);
+    if (res.error) throw res.error;
+    alert('✅ تم الحذف');
+    await loadSupSchoolSelection();
+  } catch (err) { alert('❌ ' + (err.message || err)); }
+}
+
+async function deleteStudent(id) {
+  if (!confirm('⚠️ حذف الطالب؟')) return;
+  try {
+    const res = await window.db.from('students').delete().eq('national_id', id);
+    if (res.error) throw res.error;
+    alert('✅ تم الحذف');
+    await loadSupSchoolSelection();
+  } catch (err) { alert('❌ ' + (err.message || err)); }
+}
+
+// ============================================================
+// تبويب التقارير
+// ============================================================
+async function onSupReportSchoolChange() {
+  const sel = $('rep_sch_select');
+  const code = sel.value;
+  const box = $('supReportOptionsBox');
+  if (!code) { box.classList.add('hidden'); return; }
+  const opt = sel.options[sel.selectedIndex];
+  $('supReportSchoolName').textContent = '🏫 ' + (opt.dataset.name || '');
+  box.classList.remove('hidden');
+  // إعادة تعيين المواد محددة
+  document.querySelectorAll('#sup_report_subjects_list input[type="checkbox"]').forEach(cb => {
+    cb.checked = true;
+    cb.closest('label').classList.toggle('checked', true);
+  });
+  await loadSupReportSections(code);
+}
+
+async function loadSupReportSections(schoolCode) {
+  const list = $('sup_report_sections_list');
+  list.innerHTML = '<div class="muted" style="grid-column:1/-1">جارٍ التحميل...</div>';
+  try {
+    const res = await window.db.from('students')
+      .select('section')
+      .eq('school_id', parseInt(schoolCode, 10));
+    if (res.error) throw res.error;
+    const data = res.data || [];
+    const uniq = {};
+    data.forEach(s => {
+      if (s.section && String(s.section).trim()) uniq[String(s.section).trim()] = true;
+    });
+    const sections = Object.keys(uniq).sort();
+    if (!sections.length) {
+      list.innerHTML = '<div class="muted" style="grid-column:1/-1">لا توجد شعب مسجلة</div>';
+      return;
+    }
+    list.innerHTML = sections.map(sec => `
+      <label class="checked">
+        <input type="checkbox" value="${escapeHtml(sec)}" checked />
+        <span>شعبة ${escapeHtml(sec)}</span>
+      </label>
+    `).join('');
+    list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.closest('label').classList.toggle('checked', cb.checked);
+      cb.addEventListener('change', () => {
+        cb.closest('label').classList.toggle('checked', cb.checked);
+      });
+    });
+  } catch (err) {
+    console.error('loadSupReportSections:', err);
+    list.innerHTML = '<div class="muted" style="grid-column:1/-1">خطأ في التحميل</div>';
+  }
+}
+
+function toggleAllSections(listId, checked) {
+  document.querySelectorAll('#' + listId + ' input[type="checkbox"]').forEach(cb => {
+    cb.checked = checked;
+    cb.closest('label').classList.toggle('checked', checked);
+  });
+}
+
+function cancelSupReportOptions() {
+  $('supReportOptionsBox').classList.add('hidden');
+  $('rep_sch_select').value = '';
+}
+
+function generateSupReport() {
+  const schoolCode = $('rep_sch_select').value;
+  if (!schoolCode) { alert('اختر مدرسة'); return; }
+
+  const subjects = [];
+  document.querySelectorAll('#sup_report_subjects_list input[type="checkbox"]:checked').forEach(cb => {
+    subjects.push(cb.value);
+  });
+  if (!subjects.length) { alert('اختر مادة واحدة على الأقل'); return; }
+
+  const sections = [];
+  document.querySelectorAll('#sup_report_sections_list input[type="checkbox"]:checked').forEach(cb => {
+    sections.push(cb.value);
+  });
+  if (!sections.length) { alert('اختر شعبة واحدة على الأقل'); return; }
+
+  const sel = $('rep_sch_select');
+  const schoolName = sel.options[sel.selectedIndex].dataset.name || '';
+  const sectionParam = sections.join(',');
+  const sectionLabel = sections.map(s => 'شعبة ' + s).join('، ');
+
+  __reportsList = subjects.map(subj => {
+    const subjectLabel = subj === 'math' ? 'الرياضيات' : 'العلوم';
+    const q = new URLSearchParams();
+    q.set('mode', 'section');
+    q.set('embed', '1');
+    q.set('school_id', schoolCode);
+    q.set('section', sectionParam);
+    q.set('subject', subj);
+    return {
+      subject: subj,
+      subjectLabel,
+      url: 'report.html?' + q.toString(),
+      subtitle: schoolName + ' — ' + sectionLabel + ' — ' + subjectLabel
+    };
+  });
+
+  __activeReportIdx = 0;
+  renderReportTabs();
+  showReportAtIndex(0);
+}
+
+function renderReportTabs() {
+  const tabsBox = $('reportTabs');
+  if (__reportsList.length <= 1) {
+    tabsBox.classList.add('hidden');
+    tabsBox.innerHTML = '';
+    return;
+  }
+  tabsBox.classList.remove('hidden');
+  tabsBox.innerHTML = __reportsList.map((r, i) =>
+    `<button class="${i === __activeReportIdx ? 'active' : ''}" onclick="showReportAtIndex(${i})">${r.subjectLabel}</button>`
+  ).join('');
+}
+
+function showReportAtIndex(idx) {
+  if (idx < 0 || idx >= __reportsList.length) return;
+  __activeReportIdx = idx;
+  const r = __reportsList[idx];
+  $('embeddedReportTitle').textContent = '📊 تقرير ' + r.subjectLabel;
+  $('embeddedReportSubtitle').textContent = r.subtitle || '';
+  $('embeddedReportFrame').src = r.url;
+  $('embeddedReportSection').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  renderReportTabs();
+}
+
+function openSchoolReport(subject) {
+  if (!supViewState.schoolCode) { alert('اختر مدرسة أولاً'); return; }
+  const subjectLabel = subject === 'math' ? 'الرياضيات' : 'العلوم';
+  const q = new URLSearchParams();
+  q.set('mode', 'school');
+  q.set('embed', '1');
+  q.set('school_id', supViewState.schoolCode);
+  q.set('subject', subject);
+  __reportsList = [{
+    subject,
+    subjectLabel,
+    url: 'report.html?' + q.toString(),
+    subtitle: supViewState.schoolName + ' — ' + subjectLabel
+  }];
+  __activeReportIdx = 0;
+  renderReportTabs();
+  showReportAtIndex(0);
+}
+
+function openStudentReport(subject) {
+  if (!__supSelectedStudentId) { alert('اختر طالباً أولاً'); return; }
+  const subjectLabel = subject === 'math' ? 'الرياضيات' : 'العلوم';
+  const q = new URLSearchParams();
+  q.set('mode', 'student');
+  q.set('embed', '1');
+  q.set('sid', __supSelectedStudentId);
+  q.set('subject', subject);
+  __reportsList = [{
+    subject,
+    subjectLabel,
+    url: 'report.html?' + q.toString(),
+    subtitle: __supSelectedStudentId + ' — ' + subjectLabel
+  }];
+  __activeReportIdx = 0;
+  renderReportTabs();
+  showReportAtIndex(0);
+}
+
+function closeEmbeddedReport() {
+  $('embeddedReportSection').classList.add('hidden');
+  $('embeddedReportFrame').src = 'about:blank';
+  document.body.style.overflow = '';
+  __reportsList = [];
+  __activeReportIdx = 0;
+  $('reportTabs').classList.add('hidden');
+  $('reportTabs').innerHTML = '';
+}
+
+function openInNewTab() {
+  if (!__reportsList.length) return;
+  const r = __reportsList[__activeReportIdx];
+  if (r && r.url) window.open(r.url.replace('embed=1&', '').replace('&embed=1', ''), '_blank');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تقرير الأداء — TIMSS 2027</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ============================================================
+   تخصيصات صفحة التقرير
+   ============================================================ */
+header { padding: 10px 4%; }
+.logo { font-size: 17px; }
+header .sub { font-size: 11px; }
+
+main {
+  padding: 10px 14px;
+  margin: 0 auto;
+  max-width: 1100px;
+  width: 100%;
+}
+main .panel { padding: 14px; margin-bottom: 10px; }
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--line);
+}
+.report-header h2 { margin: 0; font-size: 18px; color: var(--navy); }
+.report-meta { text-align: left; color: #66768a; font-size: 12px; line-height: 1.7; }
+.report-meta b { color: var(--navy); }
+
+.grid4 { gap: 8px; }
+main .stat { padding: 10px; }
+main .stat span { font-size: 11px; }
+main .stat b { font-size: 20px; margin-top: 3px; }
+main .stat.green-stat b { color: var(--green); }
+main .stat.red-stat b { color: var(--red); }
+main .stat.blue-stat b { color: var(--blue); }
+main .stat.gold-stat b { color: var(--gold); }
+
+/* Loading */
+.loading { text-align: center; padding: 40px 20px; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 4px solid var(--line);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Error */
+.error-panel { text-align: center; padding: 30px 20px; }
+.error-panel h2 { color: var(--red); margin-bottom: 10px; font-size: 18px; }
+.error-panel .icon { font-size: 50px; margin-bottom: 10px; opacity: .7; }
+
+/* Charts */
+.chart-container { position: relative; height: 240px; margin: 10px 0; }
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chart-box {
+  background: #fafbfd;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+}
+.chart-box h4 { margin: 0 0 8px; color: var(--navy); font-size: 13px; text-align: center; }
+
+/* Wrong questions */
+.wrong-item {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  border-right: 4px solid var(--red);
+  margin-bottom: 10px;
+}
+.wrong-item .q-code { font-weight: 800; color: var(--navy); font-size: 12px; }
+.wrong-item .q-text { font-size: 13px; line-height: 1.7; margin: 8px 0; }
+.wrong-item .correct-answer {
+  background: #e5f5ed;
+  border-right: 3px solid var(--green);
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin: 8px 0;
+  font-size: 12px;
+}
+.wrong-item .explanation {
+  background: #f8fafc;
+  border-right: 3px solid var(--blue);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.empty-state { text-align: center; padding: 30px 20px; color: #66768a; }
+.empty-state .icon { font-size: 50px; margin-bottom: 8px; opacity: .5; }
+
+/* Tables */
+.tbl-wrap { overflow-x: auto; margin-top: 10px; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.tbl th, .tbl td { border-bottom: 1px solid var(--line); padding: 8px 6px; text-align: right; }
+.tbl th { background: #f4f7fa; font-weight: 800; color: var(--navy); font-size: 11px; }
+.tbl .center { text-align: center; }
+.tbl .good { color: var(--green); font-weight: 700; }
+.tbl .bad { color: var(--red); font-weight: 700; }
+.tbl .warn { color: var(--gold); font-weight: 700; }
+
+.rank-badge {
+  display: inline-block;
+  width: 24px; height: 24px;
+  line-height: 24px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 11px;
+  text-align: center;
+}
+.rank-1 { background: #ffd700; color: #7a5a00; }
+.rank-2 { background: #c0c0c0; color: #4a4a4a; }
+.rank-3 { background: #cd7f32; color: #4a2500; }
+.rank-other { background: #edf4fb; color: #225987; }
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+  justify-content: center;
+}
+.action-buttons button { padding: 9px 16px; font-size: 13px; }
+
+footer { padding: 8px; font-size: 10px; }
+
+/* وضع Embed (داخل iframe) */
+body.embed-mode header,
+body.embed-mode footer,
+body.embed-mode .nav-bar,
+body.embed-mode .action-buttons,
+body.embed-mode .dedication-box {
+  display: none !important;
+}
+body.embed-mode main { margin: 0 auto; padding: 10px; }
+body.embed-mode .panel { box-shadow: none; }
+
+/* الطباعة */
+@media print {
+  body { background: #fff; }
+  .no-print, header, footer, button, .action-buttons, .nav-bar { display: none !important; }
+  .panel { box-shadow: none; border: 1px solid #ddd; }
+  .chart-container { height: 200px; }
+  main { max-width: 100%; margin: 0; padding: 0; }
+  @page { size: A4; margin: 12mm; }
+}
+
+@media (max-width: 780px) {
+  .charts-grid, .grid4 { grid-template-columns: 1fr; }
+  header { align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+<header class="no-print">
+  <div>
+    <div class="logo">منصة تدريب TIMSS 2027</div>
+    <div class="sub" id="headerSubject">التقرير</div>
+  </div>
+  <div class="sub" id="headerStudent">—</div>
+</header>
+
+<div class="nav-bar no-print">
+  <span class="nav-label">التنقل السريع</span>
+  <div class="nav-btns">
+    <button class="nav-btn back" onclick="navBack()">⬅ رجوع</button>
+    <button class="nav-btn exit" onclick="logout()">🚪 خروج</button>
+  </div>
+</div>
+
+<main>
+  <!-- إهداء -->
+  <div class="dedication-box no-print">
+    <h3>🎓 إهداء</h3>
+    <p>إلى مديرية التربية والتعليم لمنطقة الزرقاء الثانية — <span class="name">الأستاذ: عواد دحبور</span></p>
+    <a href="https://wa.me/962788107669" target="_blank" class="btn-whatsapp">📞 +962 788107669</a>
+  </div>
+
+  <!-- Loading -->
+  <section class="panel loading" id="loadingPanel">
+    <div class="spinner"></div>
+    <p class="muted" id="loadingText">جارٍ تحضير التقرير...</p>
+  </section>
+
+  <!-- Error -->
+  <section class="panel hidden error-panel" id="errorPanel">
+    <div class="icon">🔒</div>
+    <h2>تعذّر فتح التقرير</h2>
+    <p class="muted" id="errorText">—</p>
+    <div class="action-buttons no-print">
+      <button class="primary" onclick="window.location.href='index.html'">🏠 العودة إلى البوابة</button>
+    </div>
+  </section>
+
+  <!-- 👤 تقرير الطالب -->
+  <div id="studentReportContent" class="hidden">
+    <section class="panel">
+      <div class="report-header">
+        <h2>📊 تقرير الطالب</h2>
+        <div class="report-meta">
+          <div>الطالب: <b id="repStudentName">—</b></div>
+          <div>المادة: <b id="repSubject">—</b></div>
+          <div>التاريخ: <b id="repDate">—</b></div>
+        </div>
+      </div>
+      <div class="grid4">
+        <div class="stat blue-stat"><span>📚 إجمالي المتاحة</span><b id="statTotal">0</b></div>
+        <div class="stat"><span>✍️ المُجابة</span><b id="statAttempted">0</b></div>
+        <div class="stat green-stat"><span>✅ صحيحة</span><b id="statCorrect">0</b></div>
+        <div class="stat red-stat"><span>❌ خاطئة</span><b id="statWrong">0</b></div>
+      </div>
+      <div class="grid4" style="margin-top:8px">
+        <div class="stat"><span>⚪ لم يُجب</span><b id="statNotAttempted">0</b></div>
+        <div class="stat"><span>🎯 النقاط</span><b id="statScore">0 / 0</b></div>
+        <div class="stat"><span>📈 نسبة الأداء</span><b id="pctAttempted">0%</b></div>
+        <div class="stat"><span>🏆 نسبة الإتقان</span><b id="pctTotal">0%</b></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h3 style="margin-top:0;color:var(--navy);font-size:15px">📈 التحليل البياني</h3>
+      <div class="chart-box" style="margin-bottom:10px"><h4>توزيع الإجابات</h4><div class="chart-container"><canvas id="pieChart"></canvas></div></div>
+      <div class="charts-grid">
+        <div class="chart-box"><h4>حسب المستوى المعرفي</h4><div class="chart-container"><canvas id="cogChart"></canvas></div></div>
+        <div class="chart-box"><h4>حسب الصعوبة</h4><div class="chart-container"><canvas id="diffChart"></canvas></div></div>
+      </div>
+      <div class="chart-box hidden" id="branchChartBox" style="margin-top:10px"><h4>فروع العلوم</h4><div class="chart-container"><canvas id="branchChart"></canvas></div></div>
+    </section>
+    <section class="panel">
+      <h3 style="margin-top:0;color:var(--navy);font-size:15px">📚 الأسئلة الخاطئة</h3>
+      <div id="wrongQuestionsList"></div>
+    </section>
+    <div class="action-buttons no-print">
+      <button class="primary" onclick="window.print()">🖨️ طباعة</button>
+      <button class="green" onclick="goExam()">✍️ بدء جلسة جديدة</button>
+    </div>
+  </div>
+
+  <!-- 👥 تقرير الشعبة -->
+  <div id="sectionReportContent" class="hidden">
+    <section class="panel">
+      <div class="report-header">
+        <h2>👥 تقرير الشعبة</h2>
+        <div class="report-meta">
+          <div>المدرسة: <b id="secSchoolName">—</b></div>
+          <div>الشعبة: <b id="secSectionName">—</b></div>
+          <div>المادة: <b id="secSubject">—</b></div>
+          <div>التاريخ: <b id="secDate">—</b></div>
+        </div>
+      </div>
+      <div class="grid4">
+        <div class="stat blue-stat"><span>👥 إجمالي الطلاب</span><b id="secTotalStudents">0</b></div>
+        <div class="stat"><span>✍️ لديهم محاولات</span><b id="secActiveStudents">0</b></div>
+        <div class="stat green-stat"><span>📊 متوسط النقاط</span><b id="secAvgScore">0</b></div>
+        <div class="stat gold-stat"><span>🎯 متوسط الصحيح</span><b id="secAvgCorrect">0</b></div>
+      </div>
+      <div class="grid4" style="margin-top:8px">
+        <div class="stat green-stat"><span>🏆 أعلى نتيجة</span><b id="secMaxScore">0</b></div>
+        <div class="stat red-stat"><span>📉 أدنى نتيجة</span><b id="secMinScore">0</b></div>
+        <div class="stat"><span>📚 الأسئلة</span><b id="secTotalQuestions">0</b></div>
+        <div class="stat"><span>🎯 أقصى نقاط</span><b id="secMaxPossible">0</b></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h3 style="margin-top:0;color:var(--navy);font-size:15px">📊 توزيع النتائج</h3>
+      <div class="chart-box"><h4>توزيع النقاط</h4><div class="chart-container"><canvas id="secHistogram"></canvas></div></div>
+    </section>
+    <section class="panel">
+      <h3 style="margin-top:0;color:var(--navy);font-size:15px">📋 قائمة الطلاب</h3>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th class="center">#</th>
+            <th>الطالب</th>
+            <th class="center">حاول</th>
+            <th class="center">صحيح</th>
+            <th class="center">خاطئ</th>
+            <th class="center">النقاط</th>
+            <th class="center">الإتقان</th>
+            <th class="center no-print">تقرير</th>
+          </tr></thead>
+          <tbody id="secStudentsTable"></tbody>
+        </table>
+      </div>
+    </section>
+    <div class="action-buttons no-print">
+      <button class="primary" onclick="window.print()">🖨️ طباعة</button>
+    </div>
+  </div>
+
+  <!-- 🏫 تقرير المدرسة -->
+  <div id="schoolReportContent" class="hidden">
+    <section class="panel">
+      <div class="report-header">
+        <h2>🏫 تقرير المدرسة</h2>
+        <div class="report-meta">
+          <div>المدرسة: <b id="schSchoolName">—</b></div>
+          <div>المادة: <b id="schSubject">—</b></div>
+          <div>التاريخ: <b id="schDate">—</b></div>
+        </div>
+      </div>
+      <div class="grid4">
+        <div class="stat blue-stat"><span>👥 إجمالي الطلاب</span><b id="schTotalStudents">0</b></div>
+        <div class="stat"><span>✍️ لديهم محاولات</span><b id="schActiveStudents">0</b></div>
+        <div class="stat green-stat"><span>📊 متوسط النقاط</span><b id="schAvgScore">0</b></div>
+        <div class="stat"><span>📚 الأسئلة</span><b id="schTotalQuestions">0</b></div>
+      </div>
+    </section>
+    <section class="panel">
+      <h3 style="margin-top:0;color:var(--navy);font-size:15px">📊 مقارنة الشعب</h3>
+      <div class="chart-box"><h4>متوسط النقاط لكل شعبة</h4><div class="chart-container"><canvas id="schSectionsChart"></canvas></div></div>
+    </section>
+    <section class="panel">
+      <h3 style="margin-top:0;color:var(--navy);font-size:15px">📋 الشعب</h3>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th>الشعبة</th>
+            <th class="center">عدد الطلاب</th>
+            <th class="center">لديهم محاولات</th>
+            <th class="center">متوسط النقاط</th>
+            <th class="center">الصحيح/المُجاب</th>
+            <th class="center">نسبة الإتقان</th>
+            <th class="center no-print">تفاصيل</th>
+          </tr></thead>
+          <tbody id="schSectionsTable"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="panel">
+      <h3 style="margin-top:0;color:var(--navy);font-size:15px">🏆 أفضل 10 طلاب</h3>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th class="center">#</th>
+            <th>الطالب</th>
+            <th class="center">الشعبة</th>
+            <th class="center">صحيح</th>
+            <th class="center">حاول</th>
+            <th class="center">النقاط</th>
+            <th class="center no-print">تقرير</th>
+          </tr></thead>
+          <tbody id="schTopStudentsTable"></tbody>
+        </table>
+      </div>
+    </section>
+    <div class="action-buttons no-print">
+      <button class="primary" onclick="window.print()">🖨️ طباعة</button>
+    </div>
+  </div>
+</main>
+
+<div class="nav-bar bottom no-print">
+  <span class="nav-label">التنقل السريع</span>
+  <div class="nav-btns">
+    <button class="nav-btn back" onclick="navBack()">⬅ رجوع</button>
+    <button class="nav-btn exit" onclick="logout()">🚪 خروج</button>
+  </div>
+</div>
+
+<footer class="no-print">منصة تدريبية مستقلة مستلهمة من إطار TIMSS.</footer>
+
+<!-- المكتبات -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  if (typeof supabase === 'undefined') {
+    document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+
+const state = {
+  subject: null,
+  subjectAr: null,
+  attemptId: null,
+  charts: {},
+  student: null,
+  mode: null,
+  schoolId: null,
+  section: null
+};
+
+// ============================================================
+// التهيئة
+// ============================================================
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get('mode');
+  const sid = params.get('sid');
+  const subj = params.get('subject');
+  const schoolId = params.get('school_id');
+  const section = params.get('section');
+  const attemptId = params.get('attempt_id');
+  const embed = params.get('embed') === '1';
+
+  if (embed) document.body.classList.add('embed-mode');
+
+  if (!subj || !['math', 'science'].includes(subj)) {
+    return showError('الرابط لا يحتوي على المادة المطلوبة.\nافتح التقرير من بوابة المستخدمين.');
+  }
+
+  state.subject = subj;
+  state.subjectAr = subj === 'math' ? 'الرياضيات' : 'العلوم';
+  state.mode = mode;
+  state.schoolId = schoolId;
+  state.section = section;
+  state.attemptId = attemptId;
+
+  if (mode === 'section') {
+    if (!schoolId) return showError('الرابط لا يحتوي على رقم المدرسة.');
+    await loadSectionReport(schoolId, section, subj);
+    return;
+  }
+  if (mode === 'school') {
+    if (!schoolId) return showError('الرابط لا يحتوي على رقم المدرسة.');
+    await loadSchoolReport(schoolId, subj);
+    return;
+  }
+  if (mode === 'student' || (!mode && sid)) {
+    if (!sid) return showError('الرابط لا يحتوي على رقم الطالب.');
+    await loadStudentReport(sid, subj, attemptId);
+    return;
+  }
+  showError('نوع التقرير غير محدد.\nافتح التقرير من بوابة المستخدمين.');
+}
+
+function hideAll() {
+  ['loadingPanel', 'errorPanel', 'studentReportContent', 'sectionReportContent', 'schoolReportContent']
+    .forEach(id => $(id).classList.add('hidden'));
+}
+
+function showError(msg) {
+  hideAll();
+  $('errorPanel').classList.remove('hidden');
+  $('errorText').textContent = msg;
+}
+
+// ============================================================
+// 👤 تقرير الطالب
+// ============================================================
+async function loadStudentReport(sid, subject, attemptId) {
+  hideAll();
+  $('loadingPanel').classList.remove('hidden');
+  $('loadingText').textContent = 'جارٍ تحضير تقرير الطالب...';
+
+  state.attemptId = attemptId;
+  state.student = { national_id: sid };
+  const subjectCode = subject === 'math' ? 'MATH' : 'SCI';
+  const branchCodes = subject === 'math' ? ['MATH'] : ['BIO', 'CHEM', 'PHYS', 'EARTH'];
+
+  try {
+    const sRes = await window.db.from('students')
+      .select('national_id, full_name, grade, section, school_id')
+      .eq('national_id', sid).maybeSingle();
+    if (sRes.error) throw sRes.error;
+    if (!sRes.data) throw new Error('الطالب ' + sid + ' غير موجود.');
+    state.student = sRes.data;
+
+    const rRes = await window.db.rpc('get_full_report', {
+      p_student_id: sid,
+      p_subject: subjectCode
+    });
+    if (rRes.error) throw rRes.error;
+    if (!rRes.data) throw new Error('لم يتم إرجاع بيانات التقرير.');
+
+    const wRes = await window.db.from('student_question_attempts')
+      .select('question_code, cognitive, difficulty, score, updated_at, questions!inner (question_text, options, correct_answer, explanation, domain, subject_code)')
+      .eq('student_id', sid).eq('score', 0)
+      .in('questions.subject_code', branchCodes)
+      .order('updated_at', { ascending: false }).limit(50);
+    if (wRes.error) throw wRes.error;
+
+    renderStudentReport(rRes.data, wRes.data || []);
+    $('loadingPanel').classList.add('hidden');
+    $('studentReportContent').classList.remove('hidden');
+  } catch (err) {
+    console.error('loadStudentReport:', err);
+    showError(err.message || String(err));
+  }
+}
+
+function renderStudentReport(report, wrongQs) {
+  $('headerStudent').textContent = state.student.full_name || state.student.national_id;
+  $('headerSubject').textContent = 'تقرير الطالب — ' + state.subjectAr;
+  $('repStudentName').textContent = state.student.full_name || state.student.national_id;
+  $('repSubject').textContent = state.subjectAr;
+  $('repDate').textContent = new Date().toLocaleString('ar-JO');
+
+  const total = Number(report.total_available || 0);
+  const attempted = Number(report.attempted || 0);
+  const correct = Number(report.correct || 0);
+  const wrong = Number(report.wrong || 0);
+  const notAttempted = Number(report.not_attempted || 0);
+  const totalScore = Number(report.total_score || 0);
+  const maxPossible = Number(report.max_possible || 0);
+
+  $('statTotal').textContent = total;
+  $('statAttempted').textContent = attempted;
+  $('statCorrect').textContent = correct;
+  $('statWrong').textContent = wrong;
+  $('statNotAttempted').textContent = notAttempted;
+  $('statScore').textContent = totalScore.toFixed(1) + ' / ' + maxPossible.toFixed(1);
+  $('pctAttempted').textContent = (attempted > 0 ? (correct / attempted * 100) : 0).toFixed(1) + '%';
+  $('pctTotal').textContent = (total > 0 ? (correct / total * 100) : 0).toFixed(1) + '%';
+
+  destroyChart('pie');
+  state.charts.pie = new Chart($('pieChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['✅ صحيحة', '❌ خاطئة', '⚪ لم يُجب'],
+      datasets: [{
+        data: [correct, wrong, notAttempted],
+        backgroundColor: ['#18845d', '#a52d37', '#cbd5e1'],
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Cairo' } } },
+        tooltip: { rtl: true }
+      }
+    }
+  });
+
+  renderBarChart('cog', 'cogChart',
+    (report.by_cognitive || []).map(d => d.cognitive || '—'),
+    (report.by_cognitive || []).map(d => Number(d.correct || 0)),
+    (report.by_cognitive || []).map(d => Number(d.wrong || 0)));
+
+  renderBarChart('diff', 'diffChart',
+    (report.by_difficulty || []).map(d => d.difficulty || '—'),
+    (report.by_difficulty || []).map(d => Number(d.correct || 0)),
+    (report.by_difficulty || []).map(d => Number(d.wrong || 0)));
+
+  if (state.subject === 'science' && report.by_branch) {
+    const names = { BIO: '🧬 أحياء', CHEM: '⚗️ كيمياء', PHYS: '⚡ فيزياء', EARTH: '🌍 أرض' };
+    $('branchChartBox').classList.remove('hidden');
+    renderBarChart('branch', 'branchChart',
+      (report.by_branch || []).map(d => names[d.branch] || d.branch),
+      (report.by_branch || []).map(d => Number(d.correct || 0)),
+      (report.by_branch || []).map(d => Number(d.wrong || 0)));
+  } else {
+    $('branchChartBox').classList.add('hidden');
+  }
+
+  renderWrongQs(wrongQs);
+}
+
+function renderBarChart(key, canvasId, labels, correctData, wrongData) {
+  destroyChart(key);
+  if (!labels.length) return;
+  state.charts[key] = new Chart($(canvasId).getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: '✅ صحيحة', data: correctData, backgroundColor: '#18845d' },
+        { label: '❌ خاطئة', data: wrongData, backgroundColor: '#a52d37' }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { family: 'Cairo', size: 11 } } },
+        tooltip: { rtl: true }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Cairo' } } },
+        x: { ticks: { font: { family: 'Cairo', size: 10 } } }
+      }
+    }
+  });
+}
+
+function renderWrongQs(items) {
+  const c = $('wrongQuestionsList');
+  if (!items || !items.length) {
+    c.innerHTML = '<div class="empty-state"><div class="icon">🎉</div><p>لا توجد أسئلة خاطئة.</p></div>';
+    return;
+  }
+  c.innerHTML = items.map((item, idx) => {
+    const q = item.questions;
+    return '<div class="wrong-item">' +
+      '<div class="q-code">#' + (idx + 1) + ' · ' + esc(item.question_code) + ' — ' + esc(item.cognitive || '') + ' · ' + esc(item.difficulty || '') + '</div>' +
+      '<div class="q-text">' + esc(q.question_text || '') + '</div>' +
+      '<div class="correct-answer"><b>✅ الإجابة الصحيحة:</b> ' + esc(q.correct_answer || '') + '</div>' +
+      '<div class="explanation"><b>💡 الشرح:</b> ' + esc(q.explanation || 'لا يوجد شرح.') + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// ============================================================
+// 👥 تقرير الشعبة — يدعم شعب متعددة
+// ============================================================
+async function loadSectionReport(schoolId, section, subject) {
+  hideAll();
+  $('loadingPanel').classList.remove('hidden');
+  $('loadingText').textContent = 'جارٍ تحضير تقرير الشعبة...';
+
+  const subjectCode = subject === 'math' ? 'MATH' : 'SCI';
+  const sectionList = (section || '').split(',').map(s => s.trim()).filter(s => s);
+
+  try {
+    let reportData;
+    if (sectionList.length <= 1) {
+      const rRes = await window.db.rpc('get_section_report', {
+        p_school_id: String(schoolId),
+        p_section: sectionList[0] || '',
+        p_subject: subjectCode
+      });
+      if (rRes.error) throw rRes.error;
+      if (!rRes.data) throw new Error('لم يتم إرجاع بيانات التقرير.');
+      reportData = rRes.data;
+    } else {
+      const results = await Promise.all(
+        sectionList.map(sec => window.db.rpc('get_section_report', {
+          p_school_id: String(schoolId),
+          p_section: sec,
+          p_subject: subjectCode
+        }))
+      );
+      for (const r of results) { if (r.error) throw r.error; }
+      const combinedLabel = sectionList.map(s => 'شعبة ' + s).join('، ');
+      reportData = aggregateSectionReports(
+        results.map(r => r.data).filter(Boolean),
+        combinedLabel
+      );
+    }
+    renderSectionReport(reportData);
+    $('loadingPanel').classList.add('hidden');
+    $('sectionReportContent').classList.remove('hidden');
+  } catch (err) {
+    console.error('loadSectionReport:', err);
+    showError(err.message || String(err));
+  }
+}
+
+function aggregateSectionReports(reports, combinedLabel) {
+  if (!reports || !reports.length) return null;
+  if (reports.length === 1) return Object.assign({}, reports[0], { section: combinedLabel });
+
+  const totalQuestions = reports[0].total_questions || 0;
+  let totalStudents = 0, studentsWithAttempts = 0;
+  const allStudents = [];
+
+  reports.forEach(r => {
+    totalStudents += Number(r.total_students || 0);
+    studentsWithAttempts += Number(r.students_with_attempts || 0);
+    (r.students || []).forEach(s => allStudents.push(s));
+  });
+
+  allStudents.sort((a, b) => Number(b.total_score || 0) - Number(a.total_score || 0));
+
+  const attempted = allStudents.filter(s => Number(s.attempted || 0) > 0);
+  const scores = attempted.map(s => Number(s.total_score || 0));
+  const avgScore = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+  const maxScore = scores.length ? Math.max(...scores) : 0;
+  const minScore = scores.length ? Math.min(...scores) : 0;
+  const avgCorrect = attempted.length
+    ? attempted.reduce((sum, s) => sum + Number(s.correct || 0), 0) / attempted.length
+    : 0;
+
+  return {
+    school_id: reports[0].school_id,
+    school_name: reports[0].school_name,
+    section: combinedLabel,
+    total_students: totalStudents,
+    students_with_attempts: studentsWithAttempts,
+    class_average_score: avgScore,
+    class_avg_correct: avgCorrect,
+    class_max_score: maxScore,
+    class_min_score: minScore,
+    total_questions: totalQuestions,
+    students: allStudents
+  };
+}
+
+function renderSectionReport(report) {
+  $('headerStudent').textContent = report.school_name || ('مدرسة ' + report.school_id);
+  $('headerSubject').textContent = 'تقرير الشعبة — ' + state.subjectAr;
+  $('secSchoolName').textContent = report.school_name || '—';
+  $('secSectionName').textContent = report.section || 'جميع الشعب';
+  $('secSubject').textContent = state.subjectAr;
+  $('secDate').textContent = new Date().toLocaleString('ar-JO');
+
+  $('secTotalStudents').textContent = report.total_students || 0;
+  $('secActiveStudents').textContent = report.students_with_attempts || 0;
+  $('secAvgScore').textContent = Number(report.class_average_score || 0).toFixed(2);
+  $('secAvgCorrect').textContent = Number(report.class_avg_correct || 0).toFixed(2);
+  $('secMaxScore').textContent = Number(report.class_max_score || 0).toFixed(2);
+  $('secMinScore').textContent = Number(report.class_min_score || 0).toFixed(2);
+  $('secTotalQuestions').textContent = report.total_questions || 0;
+  $('secMaxPossible').textContent = ((report.total_questions || 0) * 2.5).toFixed(2);
+
+  const students = report.students || [];
+  renderHistogram(students);
+
+  const tbody = $('secStudentsTable');
+  if (!students.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="center muted">لا يوجد طلاب.</td></tr>';
+  } else {
+    tbody.innerHTML = students.map((s, i) => {
+      const rank = i + 1;
+      const rk = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+      const mastery = Number(s.mastery_pct || 0);
+      const mcls = mastery >= 60 ? 'good' : mastery > 0 ? 'warn' : '';
+      const mtext = s.attempted > 0 ? mastery.toFixed(1) + '%' : '—';
+      const btn = s.attempted > 0
+        ? '<button class="primary" style="padding:3px 8px;font-size:11px" onclick="viewStudent(\'' + esc(s.national_id) + '\')">👁️</button>'
+        : '<span class="muted">—</span>';
+      return '<tr>' +
+        '<td class="center"><span class="rank-badge ' + rk + '">' + rank + '</span></td>' +
+        '<td>' + esc(s.full_name) + '</td>' +
+        '<td class="center">' + s.attempted + '</td>' +
+        '<td class="center good">' + s.correct + '</td>' +
+        '<td class="center bad">' + s.wrong + '</td>' +
+        '<td class="center"><b>' + Number(s.total_score).toFixed(2) + '</b></td>' +
+        '<td class="center ' + mcls + '">' + mtext + '</td>' +
+        '<td class="center no-print">' + btn + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+}
+
+function renderHistogram(students) {
+  destroyChart('hist');
+  if (!students || !students.length) return;
+  const scores = students.map(s => Number(s.total_score || 0));
+  const maxScore = Math.max.apply(null, scores.concat([1]));
+  const buckets = 10;
+  const bucketSize = Math.ceil(maxScore / buckets) || 1;
+  const labels = [];
+  const counts = [];
+  for (let i = 0; i < buckets; i++) {
+    const start = i * bucketSize;
+    const end = (i + 1) * bucketSize;
+    labels.push(start + ' - ' + end);
+    counts.push(scores.filter(s => s >= start && (i === buckets - 1 ? s <= end : s < end)).length);
+  }
+  state.charts.hist = new Chart($('secHistogram').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ label: 'عدد الطلاب', data: counts, backgroundColor: '#2465a4', borderRadius: 6 }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { rtl: true } },
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Cairo' } } },
+        x: { ticks: { font: { family: 'Cairo', size: 10 } } }
+      }
+    }
+  });
+}
+
+function viewStudent(sid) {
+  loadStudentReport(sid, state.subject, null);
+}
+
+// ============================================================
+// 🏫 تقرير المدرسة
+// ============================================================
+async function loadSchoolReport(schoolId, subject) {
+  hideAll();
+  $('loadingPanel').classList.remove('hidden');
+  $('loadingText').textContent = 'جارٍ تحضير تقرير المدرسة...';
+
+  const subjectCode = subject === 'math' ? 'MATH' : 'SCI';
+
+  try {
+    const rRes = await window.db.rpc('get_school_report', {
+      p_school_id: String(schoolId),
+      p_subject: subjectCode
+    });
+    if (rRes.error) throw rRes.error;
+    if (!rRes.data) throw new Error('لم يتم إرجاع بيانات التقرير.');
+
+    renderSchoolReport(rRes.data);
+    $('loadingPanel').classList.add('hidden');
+    $('schoolReportContent').classList.remove('hidden');
+  } catch (err) {
+    console.error('loadSchoolReport:', err);
+    showError(err.message || String(err));
+  }
+}
+
+function renderSchoolReport(report) {
+  $('headerStudent').textContent = report.school_name || ('مدرسة ' + report.school_id);
+  $('headerSubject').textContent = 'تقرير المدرسة — ' + state.subjectAr;
+  $('schSchoolName').textContent = report.school_name || '—';
+  $('schSubject').textContent = state.subjectAr;
+  $('schDate').textContent = new Date().toLocaleString('ar-JO');
+
+  $('schTotalStudents').textContent = report.total_students || 0;
+  $('schActiveStudents').textContent = report.students_with_attempts || 0;
+  $('schAvgScore').textContent = Number(report.school_average_score || 0).toFixed(2);
+  $('schTotalQuestions').textContent = report.total_questions || 0;
+
+  const sections = report.sections || [];
+  destroyChart('sectionsChart');
+  if (sections.length) {
+    state.charts.sectionsChart = new Chart($('schSectionsChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: sections.map(s => 'شعبة ' + s.section),
+        datasets: [{
+          label: 'متوسط النقاط',
+          data: sections.map(s => Number(s.avg_score || 0)),
+          backgroundColor: '#18845d',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { rtl: true } },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 1, font: { family: 'Cairo' } } },
+          x: { ticks: { font: { family: 'Cairo' } } }
+        }
+      }
+    });
+  }
+
+  const tbody = $('schSectionsTable');
+  if (!sections.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="center muted">لا توجد شعب.</td></tr>';
+  } else {
+    tbody.innerHTML = sections.map(sec => {
+      const pct = Number(sec.percentage || 0);
+      const pcls = pct >= 60 ? 'good' : pct > 0 ? 'warn' : '';
+      return '<tr>' +
+        '<td><b>شعبة ' + esc(sec.section) + '</b></td>' +
+        '<td class="center">' + sec.total_students + '</td>' +
+        '<td class="center">' + sec.active_students + '</td>' +
+        '<td class="center"><b>' + Number(sec.avg_score || 0).toFixed(2) + '</b></td>' +
+        '<td class="center">' + (sec.total_correct || 0) + ' / ' + (sec.total_attempted || 0) + '</td>' +
+        '<td class="center ' + pcls + '">' + pct.toFixed(1) + '%</td>' +
+        '<td class="center no-print"><button class="primary" style="padding:3px 8px;font-size:11px" onclick="viewSection(\'' + esc(sec.section) + '\')">👁️</button></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  const top = report.top_students || [];
+  const topTbody = $('schTopStudentsTable');
+  if (!top.length) {
+    topTbody.innerHTML = '<tr><td colspan="7" class="center muted">لا يوجد طلاب لديهم محاولات.</td></tr>';
+  } else {
+    topTbody.innerHTML = top.map((s, i) => {
+      const rank = i + 1;
+      const rk = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+      return '<tr>' +
+        '<td class="center"><span class="rank-badge ' + rk + '">' + rank + '</span></td>' +
+        '<td>' + esc(s.full_name) + '</td>' +
+        '<td class="center">' + esc(s.section || '—') + '</td>' +
+        '<td class="center good">' + s.correct + '</td>' +
+        '<td class="center">' + s.attempted + '</td>' +
+        '<td class="center"><b>' + Number(s.total_score).toFixed(2) + '</b></td>' +
+        '<td class="center no-print"><button class="primary" style="padding:3px 8px;font-size:11px" onclick="viewStudent(\'' + esc(s.national_id) + '\')">👁️</button></td>' +
+        '</tr>';
+    }).join('');
+  }
+}
+
+function viewSection(section) {
+  const schoolId = state.schoolId;
+  if (!schoolId) { alert('رقم المدرسة مفقود'); return; }
+  loadSectionReport(schoolId, section, state.subject);
+}
+
+// ============================================================
+// أدوات
+// ============================================================
+function destroyChart(key) {
+  if (state.charts[key]) {
+    state.charts[key].destroy();
+    delete state.charts[key];
+  }
+}
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+function goExam() {
+  const sid = state.student ? state.student.national_id : '';
+  const subj = state.subject || 'math';
+  window.location.href = 'exam.html?subject=' + subj + '&sid=' + sid;
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة المعلم — TIMSS 2027</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* === تخصيص لوحة المعلم === */
+header { padding: 10px 4%; }
+.logo { font-size: 17px; }
+header .sub { font-size: 11px; }
+
+main { padding: 10px 14px; margin: 0 auto; max-width: 1050px; width: 100%; }
+main .panel { padding: 14px; margin-bottom: 10px; }
+
+.panel-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px; flex-wrap: wrap; gap: 8px;
+}
+.panel-head h2 { margin: 0; font-size: 16px; }
+
+.teacher-info {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 8px; margin-bottom: 8px;
+}
+.teacher-info .stat { padding: 8px 10px; }
+.teacher-info .stat span { font-size: 10px; }
+.teacher-info .stat b { font-size: 13px; margin-top: 2px; }
+
+main .tabs { margin-bottom: 10px; }
+main .tab-btn { padding: 8px; font-size: 13px; }
+
+main .form-box { padding: 12px; margin-top: 10px; }
+main .form-box .field { margin: 6px 0; font-size: 12px; }
+main .form-box input, main .form-box select { padding: 8px 10px; font-size: 13px; }
+
+main .actions { margin-top: 10px; gap: 6px; }
+main .actions button { padding: 9px 14px; font-size: 13px; }
+
+.add-cards {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+}
+.add-cards .subject-card { padding: 14px; cursor: pointer; }
+.add-cards .subject-card h3 { font-size: 14px; margin: 0 0 3px; }
+.add-cards .subject-card p { font-size: 11px; }
+
+main .list-item { padding: 8px 10px; font-size: 12px; margin-bottom: 6px; }
+main .info-box, main .report-box { padding: 10px; margin-top: 8px; }
+main .info-box .stat, main .report-box .stat { padding: 7px; }
+main .info-box .stat span { font-size: 10px; }
+main .info-box .stat b { font-size: 12px; }
+
+.report-step-title {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--navy);
+}
+.report-step-title.with-actions {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 6px;
+}
+
+.report-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.report-tabs button {
+  padding: 6px 12px; font-size: 11px;
+  background: rgba(255,255,255,.15); color: #fff;
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 6px; cursor: pointer;
+  font-weight: 700; transition: .15s;
+}
+.report-tabs button:hover { background: rgba(255,255,255,.3); }
+.report-tabs button.active {
+  background: #fff; color: var(--navy); border-color: #fff;
+}
+
+footer { padding: 8px; font-size: 10px; }
+
+@media (max-width: 700px) {
+  .teacher-info, .add-cards { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">منصة تدريب TIMSS 2027</div>
+    <div class="sub">لوحة المعلم</div>
+  </div>
+  <div class="sub" id="headerName">—</div>
+</header>
+
+<div class="nav-bar">
+  <span class="nav-label">التنقل السريع</span>
+  <div class="nav-btns">
+    <button class="nav-btn back" onclick="navBack()">⬅ رجوع</button>
+    <button class="nav-btn exit" onclick="logout()">🚪 خروج</button>
+  </div>
+</div>
+
+<main>
+  <!-- بيانات المعلم -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>لوحة تحكم المعلم</h2>
+      <button class="secondary" id="editTeacherBtn" style="padding:4px 10px;font-size:11px">✏️ تعديل</button>
+    </div>
+    <div class="teacher-info">
+      <div class="stat"><span>اسم المعلم</span><b id="teacherName">—</b></div>
+      <div class="stat"><span>المدرسة</span><b id="teacherSchool">—</b></div>
+    </div>
+
+    <div id="teacherEditForm" class="hidden">
+      <div class="form-box">
+        <h3 style="margin-top:0;font-size:14px">تعديل البيانات</h3>
+        <div class="grid2">
+          <label class="field">الرقم الوطني<input id="t_editId" type="text" disabled></label>
+          <label class="field">رقم المدرسة<input id="t_editSchool" type="text" disabled></label>
+          <label class="field">الاسم الكامل<input id="t_editName" type="text"></label>
+          <label class="field">رقم الهاتف<input id="t_editPhone" type="text"></label>
+          <label class="field">المادة<input id="t_editSpec" type="text"></label>
+        </div>
+        <div class="actions">
+          <button class="primary" id="saveTeacherBtn">💾 حفظ</button>
+          <button class="secondary" id="cancelTeacherBtn">إلغاء</button>
+        </div>
+        <div id="teacherMsg" class="hidden" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- التبويبات -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tchTabAdd">➕ إضافة</button>
+    <button class="tab-btn" id="tchTabView">🗂️ استعراض وحذف</button>
+    <button class="tab-btn" id="tchTabReports">📊 تقارير</button>
+  </div>
+
+  <!-- ============ تبويب الإضافة ============ -->
+  <div id="teacherAddSection" class="panel">
+    <div id="tchAddOptions" class="add-cards">
+      <div class="subject-card" onclick="showTchForm('std')">
+        <h3>👨‍🎓 طالب</h3>
+        <p class="muted" style="margin:0">إضافة طالب جديد</p>
+      </div>
+      <div class="subject-card" onclick="showTchForm('tch')">
+        <h3>👨‍🏫 معلم</h3>
+        <p class="muted" style="margin:0">إضافة معلم جديد</p>
+      </div>
+    </div>
+
+    <div id="tchFormStudent" class="hidden">
+      <button class="secondary" onclick="hideTchForms()" style="margin-bottom:10px">⬅ رجوع</button>
+      <h3 style="font-size:15px">👨‍🎓 إضافة طالب</h3>
+      <div class="form-box">
+        <div class="grid3">
+          <label class="field">الرقم الوطني<input id="add_s_id" type="text"></label>
+          <label class="field">الاسم الكامل<input id="add_s_name" type="text"></label>
+          <label class="field">الصف<input id="add_s_grade" type="text" value="الثامن"></label>
+          <label class="field">الشعبة<input id="add_s_section" type="text"></label>
+          <label class="field">رقم الهاتف<input id="add_s_phone" type="text"></label>
+        </div>
+        <div class="actions"><button class="primary" id="addStudentBtn">➕ إضافة</button></div>
+        <div id="addStudentMsg" class="hidden" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <div id="tchFormTeacher" class="hidden">
+      <button class="secondary" onclick="hideTchForms()" style="margin-bottom:10px">⬅ رجوع</button>
+      <h3 style="font-size:15px">👨‍🏫 إضافة معلم</h3>
+      <div class="form-box">
+        <label class="field">المدرسة (تلقائي)<input id="add_t_school_name" type="text" disabled></label>
+        <div class="grid2">
+          <label class="field">الرقم الوطني<input id="add_t_id" type="text"></label>
+          <label class="field">الاسم الكامل<input id="add_t_name" type="text"></label>
+          <label class="field">المادة<input id="add_t_spec" type="text"></label>
+          <label class="field">رقم الهاتف<input id="add_t_phone" type="text"></label>
+        </div>
+        <div class="actions"><button class="primary" id="addTeacherBtn">➕ إضافة</button></div>
+        <div id="addTeacherMsg" class="hidden" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ تبويب الاستعراض والحذف ============ -->
+  <div id="teacherViewSection" class="panel hidden">
+    <h3 style="margin-top:0;font-size:15px">🔍 تصفية الطلاب وعرض التقارير</h3>
+    <div class="form-box" style="margin-top:0">
+      <label class="field">اختر الشعبة
+        <select id="tch_view_section_filter" onchange="applyTeacherSectionFilter()">
+          <option value="all">جميع الشعب</option>
+        </select>
+      </label>
+      <div class="grid2" style="margin-top:10px">
+        <button class="report-action-btn" onclick="openQuickSectionReport('math')" style="padding:8px;font-size:12px">📐 تقرير رياضيات</button>
+        <button class="report-action-btn" onclick="openQuickSectionReport('science')" style="padding:8px;font-size:12px">🔬 تقرير علوم</button>
+      </div>
+    </div>
+
+    <div class="form-box hidden" id="teacherStudentInfoBox" style="border:2px solid var(--blue);background:#f0f7ff">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h4 style="margin:0;color:var(--blue);font-size:13px">👤 بيانات الطالب</h4>
+        <button class="secondary" onclick="document.getElementById('teacherStudentInfoBox').classList.add('hidden')" style="padding:3px 8px;font-size:11px">إغلاق ✖</button>
+      </div>
+      <hr style="border:0;border-top:1px solid #cbd5e1;margin:8px 0">
+      <div class="grid3">
+        <div class="stat"><span>الاسم</span><b id="info_s_name">—</b></div>
+        <div class="stat"><span>الرقم</span><b id="info_s_id">—</b></div>
+        <div class="stat"><span>الصف والشعبة</span><b id="info_s_grade">—</b></div>
+        <div class="stat"><span>الهاتف</span><b id="info_s_phone">—</b></div>
+      </div>
+    </div>
+
+    <div class="form-box hidden" id="teacherStudentReportBox" style="border:2px solid var(--green);background:#f0fdf4">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h4 style="margin:0;color:var(--green);font-size:13px">📊 تقرير: <span id="rep_s_name"></span></h4>
+        <button class="secondary" onclick="document.getElementById('teacherStudentReportBox').classList.add('hidden')" style="padding:3px 8px;font-size:11px">إغلاق ✖</button>
+      </div>
+      <hr style="border:0;border-top:1px solid #bbf7d0;margin:8px 0">
+      <div class="grid2">
+        <button class="report-action-btn" onclick="openStudentReportNow('math')" style="padding:8px;font-size:12px">📐 الرياضيات</button>
+        <button class="report-action-btn" onclick="openStudentReportNow('science')" style="padding:8px;font-size:12px">🔬 العلوم</button>
+      </div>
+    </div>
+
+    <div class="form-box" style="margin-top:8px">
+      <div id="teacherStudentsList" class="muted">جارٍ التحميل...</div>
+    </div>
+  </div>
+
+  <!-- ============ تبويب التقارير ============ -->
+  <div id="teacherReportSection" class="panel hidden">
+    <h3 style="margin-top:0;font-size:15px">📊 تقارير الشعب</h3>
+    <div class="form-box">
+      <div class="report-step-title">1️⃣ اختر المواد</div>
+      <div class="sections-checklist" id="tch_report_subjects_list">
+        <label class="checked">
+          <input type="checkbox" value="math" checked />
+          <span>📐 الرياضيات</span>
+        </label>
+        <label class="checked">
+          <input type="checkbox" value="science" checked />
+          <span>🔬 العلوم</span>
+        </label>
+      </div>
+
+      <div class="report-step-title with-actions">
+        <span>2️⃣ اختر الشعب</span>
+        <div style="display:flex;gap:4px">
+          <button class="secondary" onclick="toggleAllSections('tch_report_sections_list', true)" style="padding:4px 10px;font-size:11px">✔️ تحديد الكل</button>
+          <button class="secondary" onclick="toggleAllSections('tch_report_sections_list', false)" style="padding:4px 10px;font-size:11px">✖️ إلغاء الكل</button>
+        </div>
+      </div>
+      <div class="sections-checklist" id="tch_report_sections_list">
+        <div class="muted" style="grid-column:1/-1">جارٍ التحميل...</div>
+      </div>
+
+      <div class="actions" style="margin-top:12px">
+        <button class="report-action-btn" onclick="generateTeacherReport()" style="padding:10px 20px;font-size:13px">📊 عرض التقارير</button>
+      </div>
+    </div>
+
+    <div class="form-box" style="margin-top:15px">
+      <div class="report-step-title" style="margin-top:0">👤 تقرير طالب فردي</div>
+      <label class="field">اختر الطالب
+        <select id="rep_tch_std_select"><option value="">جارٍ التحميل...</option></select>
+      </label>
+      <div class="grid2" style="margin-top:8px">
+        <button class="report-action-btn" onclick="openStudentReportNow('math')" style="padding:8px;font-size:12px">📐 الرياضيات</button>
+        <button class="report-action-btn" onclick="openStudentReportNow('science')" style="padding:8px;font-size:12px">🔬 العلوم</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="nav-bar bottom">
+  <span class="nav-label">التنقل السريع</span>
+  <div class="nav-btns">
+    <button class="nav-btn back" onclick="navBack()">⬅ رجوع</button>
+    <button class="nav-btn exit" onclick="logout()">🚪 خروج</button>
+  </div>
+</div>
+
+<footer>منصة تدريبية مستقلة مستلهمة من إطار TIMSS.</footer>
+
+<!-- إطار التقرير المدمج -->
+<section id="embeddedReportSection" class="hidden">
+  <div class="embedded-report-bar">
+    <div class="info">
+      <b id="embeddedReportTitle">📊 تقرير</b>
+      <span id="embeddedReportSubtitle">—</span>
+    </div>
+    <div class="btns">
+      <div class="report-tabs hidden" id="reportTabs"></div>
+      <button class="back" onclick="closeEmbeddedReport()">⬅ رجوع</button>
+      <button class="newtab" onclick="openInNewTab()">🔗 نافذة جديدة</button>
+    </div>
+  </div>
+  <iframe id="embeddedReportFrame" src="about:blank" title="التقرير"></iframe>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  if (typeof supabase === 'undefined') {
+    document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
+  }
+</script>
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+
+const session = requireRole('teacher');
+if (!session) { throw new Error('redirecting'); }
+
+const teacher = session.data;
+const schoolId = parseInt(teacher.school_id, 10);
+const schoolName = teacher.schools?.school_name || '—';
+
+let __teacherStudents = [];
+let __teacherSections = [];
+let __selectedStudentId = null;
+let __reportsList = [];
+let __activeReportIdx = 0;
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+function setMsg(el, text, kind) {
+  el.className = kind || 'warning';
+  el.textContent = text;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 4000);
+}
+
+// ============================================================
+// بيانات المعلم
+// ============================================================
+function fillTeacherInfo() {
+  $('headerName').textContent = teacher.full_name || teacher.national_id;
+  $('teacherName').textContent = teacher.full_name || '—';
+  $('teacherSchool').textContent = schoolName;
+  $('t_editId').value = teacher.national_id;
+  $('t_editSchool').value = teacher.school_id;
+  $('t_editName').value = teacher.full_name || '';
+  $('t_editPhone').value = teacher.phone || '';
+  $('t_editSpec').value = teacher.subject || '';
+  $('add_t_school_name').value = schoolName;
+}
+fillTeacherInfo();
+
+$('editTeacherBtn').addEventListener('click', () => $('teacherEditForm').classList.toggle('hidden'));
+$('cancelTeacherBtn').addEventListener('click', () => $('teacherEditForm').classList.add('hidden'));
+
+$('saveTeacherBtn').addEventListener('click', async () => {
+  const msgBox = $('teacherMsg');
+  const btn = $('saveTeacherBtn');
+  const newName = $('t_editName').value.trim();
+  const newPhone = $('t_editPhone').value.trim();
+  const newSpec = $('t_editSpec').value.trim();
+  if (!newName) { setMsg(msgBox, '⚠️ الاسم مطلوب', 'error'); return; }
+  btn.disabled = true; btn.textContent = '⏳...';
+  try {
+    const res = await window.db.from('teachers').update({
+      full_name: newName,
+      phone: newPhone || null,
+      subject: newSpec || null
+    }).eq('national_id', teacher.national_id);
+    if (res.error) throw res.error;
+    teacher.full_name = newName;
+    teacher.phone = newPhone;
+    teacher.subject = newSpec;
+    saveSession('teacher', teacher);
+    fillTeacherInfo();
+    setMsg(msgBox, '✅ تم التحديث', 'success');
+    setTimeout(() => $('teacherEditForm').classList.add('hidden'), 1200);
+  } catch (err) {
+    setMsg(msgBox, '❌ ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '💾 حفظ';
+  }
+});
+
+// ============================================================
+// التبويبات
+// ============================================================
+const TAB_MAP = {
+  add:     { tab: 'tchTabAdd',     section: 'teacherAddSection'    },
+  view:    { tab: 'tchTabView',    section: 'teacherViewSection'   },
+  reports: { tab: 'tchTabReports', section: 'teacherReportSection' }
+};
+
+$('tchTabAdd').addEventListener('click', () => activateTab('add'));
+$('tchTabView').addEventListener('click', () => activateTab('view'));
+$('tchTabReports').addEventListener('click', () => activateTab('reports'));
+
+function activateTab(name) {
+  Object.keys(TAB_MAP).forEach(key => {
+    const active = key === name;
+    const tabEl = $(TAB_MAP[key].tab);
+    const secEl = $(TAB_MAP[key].section);
+    if (tabEl) tabEl.classList.toggle('active', active);
+    if (secEl) secEl.classList.toggle('hidden', !active);
+  });
+  if (name === 'add') hideTchForms();
+  if (name === 'view') loadTeacherStudents();
+  if (name === 'reports') {
+    loadTeacherStudents().then(() => loadReportSectionsList());
+    loadStudentsForSelect();
+  }
+}
+
+// ============================================================
+// تبويب الإضافة
+// ============================================================
+function showTchForm(type) {
+  $('tchAddOptions').classList.add('hidden');
+  $('tchFormStudent').classList.add('hidden');
+  $('tchFormTeacher').classList.add('hidden');
+  if (type === 'std') $('tchFormStudent').classList.remove('hidden');
+  if (type === 'tch') $('tchFormTeacher').classList.remove('hidden');
+}
+function hideTchForms() {
+  $('tchAddOptions').classList.remove('hidden');
+  $('tchFormStudent').classList.add('hidden');
+  $('tchFormTeacher').classList.add('hidden');
+}
+
+$('addStudentBtn').addEventListener('click', async () => {
+  const msgBox = $('addStudentMsg');
+  const btn = $('addStudentBtn');
+  const id = $('add_s_id').value.trim();
+  const name = $('add_s_name').value.trim();
+  const grade = $('add_s_grade').value.trim();
+  const section = $('add_s_section').value.trim();
+  const phone = $('add_s_phone').value.trim();
+
+  if (!id || !name || !grade) {
+    setMsg(msgBox, '⚠️ الرقم والاسم والصف مطلوبة', 'error');
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = '⏳...';
+  try {
+    const res = await window.db.from('students').insert([{
+      national_id: id,
+      full_name: name,
+      school_id: schoolId,
+      grade,
+      section: section || null,
+      phone: phone || null
+    }]);
+    if (res.error) throw res.error;
+    setMsg(msgBox, '✅ تمت الإضافة', 'success');
+    $('add_s_id').value = ''; $('add_s_name').value = '';
+    $('add_s_section').value = ''; $('add_s_phone').value = '';
+    await loadTeacherStudents();
+  } catch (err) {
+    setMsg(msgBox, '❌ ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '➕ إضافة';
+  }
+});
+
+$('addTeacherBtn').addEventListener('click', async () => {
+  const msgBox = $('addTeacherMsg');
+  const btn = $('addTeacherBtn');
+  const id = $('add_t_id').value.trim();
+  const name = $('add_t_name').value.trim();
+  if (!id || !name) { setMsg(msgBox, '⚠️ الرقم والاسم مطلوبان', 'error'); return; }
+  btn.disabled = true; btn.textContent = '⏳...';
+  try {
+    const res = await window.db.from('teachers').insert([{
+      national_id: id,
+      full_name: name,
+      school_id: schoolId,
+      subject: $('add_t_spec').value.trim() || null,
+      phone: $('add_t_phone').value.trim() || null
+    }]);
+    if (res.error) throw res.error;
+    setMsg(msgBox, '✅ تمت الإضافة', 'success');
+    $('add_t_id').value = ''; $('add_t_name').value = '';
+    $('add_t_spec').value = ''; $('add_t_phone').value = '';
+  } catch (err) {
+    setMsg(msgBox, '❌ ' + (err.message || err), 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '➕ إضافة';
+  }
+});
+
+// ============================================================
+// تحميل الطلاب + استخراج الشعب
+// ============================================================
+async function loadTeacherStudents() {
+  const listBox = $('teacherStudentsList');
+  listBox.textContent = 'جارٍ التحميل...';
+
+  try {
+    const res = await window.db.from('students')
+      .select('national_id, full_name, grade, section, phone')
+      .eq('school_id', schoolId)
+      .order('full_name');
+
+    if (res.error) throw res.error;
+
+    __teacherStudents = res.data || [];
+    console.log('[teacher] Loaded students:', __teacherStudents.length);
+
+    const uniq = {};
+    __teacherStudents.forEach(s => {
+      const sec = String(s.section ?? '').trim();
+      if (sec) uniq[sec] = true;
+    });
+    __teacherSections = Object.keys(uniq).sort();
+    console.log('[teacher] Detected sections:', __teacherSections);
+
+    const sel = $('tch_view_section_filter');
+    const prevVal = sel.value;
+    sel.innerHTML = '<option value="all">جميع الشعب</option>' +
+      __teacherSections.map(sec =>
+        `<option value="${escapeHtml(sec)}">شعبة ${escapeHtml(sec)}</option>`
+      ).join('');
+    if (prevVal && Array.from(sel.options).some(o => o.value === prevVal)) sel.value = prevVal;
+
+    renderStudents(sel.value || 'all');
+  } catch (err) {
+    console.error('[teacher] loadTeacherStudents error:', err);
+    listBox.textContent = '❌ خطأ في التحميل: ' + (err.message || err);
+  }
+}
+
+function renderStudents(filter) {
+  const list = $('teacherStudentsList');
+  const arr = (filter === 'all' || !filter)
+    ? __teacherStudents
+    : __teacherStudents.filter(s => String(s.section ?? '').trim() === filter);
+
+  console.log('[teacher] renderStudents filter:', filter, 'count:', arr.length);
+
+  if (!arr.length) {
+    list.innerHTML = '<div class="muted">لا يوجد طلاب' +
+      (filter !== 'all' && filter ? ' في هذه الشعبة' : '') + '.</div>';
+    return;
+  }
+
+  list.innerHTML = arr.map((s, i) => `
+    <div class="list-item" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:5px">
+      <span><b>${i + 1}. ${escapeHtml(s.full_name)}</b> (${escapeHtml(s.grade)} - ${escapeHtml(s.section || '—')})</span>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="secondary" style="padding:4px 8px;font-size:11px"
+          onclick="showStudentInfo('${escapeHtml(s.national_id)}','${escapeHtml(s.full_name)}','${escapeHtml(s.grade)}','${escapeHtml(s.section || '—')}','${escapeHtml(s.phone || '—')}')">استعراض</button>
+        <button class="primary" style="padding:4px 8px;font-size:11px"
+          onclick="showStudentReportPanel('${escapeHtml(s.national_id)}','${escapeHtml(s.full_name)}')">تقرير</button>
+        <button class="danger" style="padding:4px 8px;font-size:11px"
+          onclick="deleteStudent('${escapeHtml(s.national_id)}')">حذف</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function applyTeacherSectionFilter() {
+  renderStudents($('tch_view_section_filter').value);
+}
+
+function showStudentInfo(id, name, grade, section, phone) {
+  $('info_s_name').textContent = name;
+  $('info_s_id').textContent = id;
+  $('info_s_grade').textContent = grade + ' - شعبة ' + section;
+  $('info_s_phone').textContent = phone || '—';
+  __selectedStudentId = id;
+  $('teacherStudentReportBox').classList.add('hidden');
+  $('teacherStudentInfoBox').classList.remove('hidden');
+}
+
+function showStudentReportPanel(id, name) {
+  $('rep_s_name').textContent = name;
+  __selectedStudentId = id;
+  $('teacherStudentInfoBox').classList.add('hidden');
+  $('teacherStudentReportBox').classList.remove('hidden');
+}
+
+async function deleteStudent(id) {
+  if (!confirm('⚠️ حذف الطالب؟')) return;
+  try {
+    const res = await window.db.from('students').delete().eq('national_id', id);
+    if (res.error) throw res.error;
+    alert('✅ تم الحذف');
+    await loadTeacherStudents();
+  } catch (err) {
+    alert('❌ ' + (err.message || err));
+  }
+}
+
+// ============================================================
+// دوال الشعب
+// ============================================================
+function toggleAllSections(listId, checked) {
+  document.querySelectorAll('#' + listId + ' input[type="checkbox"]').forEach(cb => {
+    cb.checked = checked;
+    cb.closest('label').classList.toggle('checked', checked);
+  });
+}
+
+function getCheckedValues(listId) {
+  const arr = [];
+  document.querySelectorAll('#' + listId + ' input[type="checkbox"]:checked').forEach(cb => arr.push(cb.value));
+  return arr;
+}
+
+function bindCheckboxStyles(listId) {
+  document.querySelectorAll('#' + listId + ' input[type="checkbox"]').forEach(cb => {
+    cb.closest('label').classList.toggle('checked', cb.checked);
+    cb.addEventListener('change', () => {
+      cb.closest('label').classList.toggle('checked', cb.checked);
+    });
+  });
+}
+
+// ============================================================
+// بناء قائمة الشعب في تبويب التقارير
+// ============================================================
+function loadReportSectionsList() {
+  const list = $('tch_report_sections_list');
+
+  if (!__teacherSections.length) {
+    list.innerHTML = '<div class="muted" style="grid-column:1/-1">لا توجد شعب مسجلة</div>';
+    return;
+  }
+
+  list.innerHTML = __teacherSections.map(sec => `
+    <label class="checked">
+      <input type="checkbox" value="${escapeHtml(sec)}" checked />
+      <span>شعبة ${escapeHtml(sec)}</span>
+    </label>
+  `).join('');
+
+  bindCheckboxStyles('tch_report_sections_list');
+}
+
+// ============================================================
+// توليد التقارير
+// ============================================================
+function generateTeacherReport() {
+  const subjects = getCheckedValues('tch_report_subjects_list');
+  if (!subjects.length) { alert('⚠️ اختر مادة واحدة على الأقل'); return; }
+
+  const sections = getCheckedValues('tch_report_sections_list');
+  if (!sections.length) { alert('⚠️ اختر شعبة واحدة على الأقل'); return; }
+
+  const sectionParam = sections.join(',');
+  const sectionLabel = sections.map(s => 'شعبة ' + s).join('، ');
+
+  __reportsList = subjects.map(subj => {
+    const subjectLabel = subj === 'math' ? 'الرياضيات' : 'العلوم';
+    const q = new URLSearchParams();
+    q.set('mode', 'section');
+    q.set('embed', '1');
+    q.set('school_id', schoolId);
+    q.set('section', sectionParam);
+    q.set('subject', subj);
+    return {
+      subject: subj,
+      subjectLabel,
+      url: 'report.html?' + q.toString(),
+      subtitle: schoolName + ' — ' + sectionLabel + ' — ' + subjectLabel
+    };
+  });
+
+  __activeReportIdx = 0;
+  renderReportTabs();
+  showReportAtIndex(0);
+}
+
+function renderReportTabs() {
+  const tabsBox = $('reportTabs');
+  if (__reportsList.length <= 1) {
+    tabsBox.classList.add('hidden');
+    tabsBox.innerHTML = '';
+    return;
+  }
+  tabsBox.classList.remove('hidden');
+  tabsBox.innerHTML = __reportsList.map((r, i) =>
+    `<button class="${i === __activeReportIdx ? 'active' : ''}" onclick="showReportAtIndex(${i})">${r.subjectLabel}</button>`
+  ).join('');
+}
+
+function showReportAtIndex(idx) {
+  if (idx < 0 || idx >= __reportsList.length) return;
+  __activeReportIdx = idx;
+  const r = __reportsList[idx];
+  $('embeddedReportTitle').textContent = '📊 تقرير ' + r.subjectLabel;
+  $('embeddedReportSubtitle').textContent = r.subtitle || '';
+  $('embeddedReportFrame').src = r.url;
+  $('embeddedReportSection').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  renderReportTabs();
+}
+
+// ============================================================
+// تقارير سريعة من الاستعراض
+// ============================================================
+function openQuickSectionReport(subject) {
+  const filter = $('tch_view_section_filter').value;
+  const sections = (filter === 'all' || !filter) ? __teacherSections : [filter];
+  if (!sections.length) { alert('لا توجد شعب'); return; }
+
+  const sectionParam = sections.join(',');
+  const sectionLabel = (filter === 'all' || !filter)
+    ? 'جميع الشعب'
+    : 'شعبة ' + filter;
+  const subjectLabel = subject === 'math' ? 'الرياضيات' : 'العلوم';
+
+  const q = new URLSearchParams();
+  q.set('mode', 'section');
+  q.set('embed', '1');
+  q.set('school_id', schoolId);
+  q.set('section', sectionParam);
+  q.set('subject', subject);
+
+  __reportsList = [{
+    subject,
+    subjectLabel,
+    url: 'report.html?' + q.toString(),
+    subtitle: schoolName + ' — ' + sectionLabel + ' — ' + subjectLabel
+  }];
+  __activeReportIdx = 0;
+  renderReportTabs();
+  showReportAtIndex(0);
+}
+
+function openStudentReportNow(subject) {
+  let sid = __selectedStudentId;
+  const sel = $('rep_tch_std_select');
+  if (sel && sel.value && !sid) sid = sel.value;
+
+  if (!sid) { alert('اختر طالباً أولاً'); return; }
+
+  const subjectLabel = subject === 'math' ? 'الرياضيات' : 'العلوم';
+  const q = new URLSearchParams();
+  q.set('mode', 'student');
+  q.set('embed', '1');
+  q.set('sid', sid);
+  q.set('subject', subject);
+
+  __reportsList = [{
+    subject,
+    subjectLabel,
+    url: 'report.html?' + q.toString(),
+    subtitle: sid + ' — ' + subjectLabel
+  }];
+  __activeReportIdx = 0;
+  renderReportTabs();
+  showReportAtIndex(0);
+}
+
+// ============================================================
+// قائمة الطلاب لاختيار تقرير فردي
+// ============================================================
+async function loadStudentsForSelect() {
+  const sel = $('rep_tch_std_select');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">جارٍ التحميل...</option>';
+
+  if (__teacherStudents.length) {
+    fillStudentsSelect(sel, __teacherStudents);
+    return;
+  }
+
+  try {
+    const res = await window.db.from('students')
+      .select('national_id, full_name')
+      .eq('school_id', schoolId)
+      .order('full_name');
+    if (res.error) throw res.error;
+    fillStudentsSelect(sel, res.data || []);
+  } catch (err) {
+    console.error('[teacher] loadStudentsForSelect error:', err);
+    sel.innerHTML = '<option value="">خطأ في التحميل</option>';
+  }
+}
+
+function fillStudentsSelect(sel, students) {
+  if (!students.length) {
+    sel.innerHTML = '<option value="">لا يوجد طلاب</option>';
+    return;
+  }
+  sel.innerHTML = '<option value="">-- اختر --</option>' +
+    students.map(s =>
+      `<option value="${escapeHtml(s.national_id)}">${escapeHtml(s.full_name)}</option>`
+    ).join('');
+}
+
+// ============================================================
+// إغلاق التقرير
+// ============================================================
+function closeEmbeddedReport() {
+  $('embeddedReportSection').classList.add('hidden');
+  $('embeddedReportFrame').src = 'about:blank';
+  document.body.style.overflow = '';
+  __reportsList = [];
+  __activeReportIdx = 0;
+  const tabs = $('reportTabs');
+  tabs.classList.add('hidden');
+  tabs.innerHTML = '';
+}
+
+function openInNewTab() {
+  if (!__reportsList.length) return;
+  const r = __reportsList[__activeReportIdx];
+  if (r && r.url) {
+    window.open(r.url.replace('embed=1&', '').replace('&embed=1', ''), '_blank');
+  }
+}
+
+// ============================================================
+// تحميل أولي
+// ============================================================
+loadTeacherStudents();
+</script>
+</body>
+</html>
