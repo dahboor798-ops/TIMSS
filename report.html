@@ -6,30 +6,17 @@
 <title>تقرير الأداء — TIMSS 2027</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-/* ============================================================
-   تخصيصات صفحة التقرير
-   ============================================================ */
 header { padding: 10px 4%; }
 .logo { font-size: 17px; }
 header .sub { font-size: 11px; }
 
-main {
-  padding: 10px 14px;
-  margin: 0 auto;
-  max-width: 1100px;
-  width: 100%;
-}
+main { padding: 10px 14px; margin: 0 auto; max-width: 1100px; width: 100%; }
 main .panel { padding: 14px; margin-bottom: 10px; }
 
 .report-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 10px; margin-bottom: 12px;
+  padding-bottom: 10px; border-bottom: 2px solid var(--line);
 }
 .report-header h2 { margin: 0; font-size: 18px; color: var(--navy); }
 .report-meta { text-align: left; color: #66768a; font-size: 12px; line-height: 1.7; }
@@ -44,7 +31,6 @@ main .stat.red-stat b { color: var(--red); }
 main .stat.blue-stat b { color: var(--blue); }
 main .stat.gold-stat b { color: var(--gold); }
 
-/* Loading */
 .loading { text-align: center; padding: 40px 20px; }
 .spinner {
   width: 40px; height: 40px;
@@ -56,53 +42,37 @@ main .stat.gold-stat b { color: var(--gold); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Error */
 .error-panel { text-align: center; padding: 30px 20px; }
 .error-panel h2 { color: var(--red); margin-bottom: 10px; font-size: 18px; }
 .error-panel .icon { font-size: 50px; margin-bottom: 10px; opacity: .7; }
 
-/* Charts */
 .chart-container { position: relative; height: 240px; margin: 10px 0; }
 .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .chart-box {
-  background: #fafbfd;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 12px;
+  background: #fafbfd; border: 1px solid var(--line);
+  border-radius: 10px; padding: 12px;
 }
 .chart-box h4 { margin: 0 0 8px; color: var(--navy); font-size: 13px; text-align: center; }
 
-/* Wrong questions */
 .wrong-item {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 12px;
-  border-right: 4px solid var(--red);
-  margin-bottom: 10px;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 10px; padding: 12px;
+  border-right: 4px solid var(--red); margin-bottom: 10px;
 }
 .wrong-item .q-code { font-weight: 800; color: var(--navy); font-size: 12px; }
 .wrong-item .q-text { font-size: 13px; line-height: 1.7; margin: 8px 0; }
 .wrong-item .correct-answer {
-  background: #e5f5ed;
-  border-right: 3px solid var(--green);
-  padding: 8px 10px;
-  border-radius: 6px;
-  margin: 8px 0;
-  font-size: 12px;
+  background: #e5f5ed; border-right: 3px solid var(--green);
+  padding: 8px 10px; border-radius: 6px; margin: 8px 0; font-size: 12px;
 }
 .wrong-item .explanation {
-  background: #f8fafc;
-  border-right: 3px solid var(--blue);
-  padding: 8px 10px;
-  border-radius: 6px;
-  font-size: 12px;
+  background: #f8fafc; border-right: 3px solid var(--blue);
+  padding: 8px 10px; border-radius: 6px; font-size: 12px;
 }
 
 .empty-state { text-align: center; padding: 30px 20px; color: #66768a; }
 .empty-state .icon { font-size: 50px; margin-bottom: 8px; opacity: .5; }
 
-/* Tables */
 .tbl-wrap { overflow-x: auto; margin-top: 10px; }
 .tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
 .tbl th, .tbl td { border-bottom: 1px solid var(--line); padding: 8px 6px; text-align: right; }
@@ -113,13 +83,9 @@ main .stat.gold-stat b { color: var(--gold); }
 .tbl .warn { color: var(--gold); font-weight: 700; }
 
 .rank-badge {
-  display: inline-block;
-  width: 24px; height: 24px;
-  line-height: 24px;
-  border-radius: 50%;
-  font-weight: 800;
-  font-size: 11px;
-  text-align: center;
+  display: inline-block; width: 24px; height: 24px;
+  line-height: 24px; border-radius: 50%;
+  font-weight: 800; font-size: 11px; text-align: center;
 }
 .rank-1 { background: #ffd700; color: #7a5a00; }
 .rank-2 { background: #c0c0c0; color: #4a4a4a; }
@@ -127,28 +93,21 @@ main .stat.gold-stat b { color: var(--gold); }
 .rank-other { background: #edf4fb; color: #225987; }
 
 .action-buttons {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 15px;
-  justify-content: center;
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-top: 15px; justify-content: center;
 }
 .action-buttons button { padding: 9px 16px; font-size: 13px; }
 
 footer { padding: 8px; font-size: 10px; }
 
-/* وضع Embed (داخل iframe) */
 body.embed-mode header,
 body.embed-mode footer,
 body.embed-mode .nav-bar,
 body.embed-mode .action-buttons,
-body.embed-mode .dedication-box {
-  display: none !important;
-}
+body.embed-mode .dedication-box { display: none !important; }
 body.embed-mode main { margin: 0 auto; padding: 10px; }
 body.embed-mode .panel { box-shadow: none; }
 
-/* الطباعة */
 @media print {
   body { background: #fff; }
   .no-print, header, footer, button, .action-buttons, .nav-bar { display: none !important; }
@@ -182,20 +141,17 @@ body.embed-mode .panel { box-shadow: none; }
 </div>
 
 <main>
-  <!-- إهداء -->
   <div class="dedication-box no-print">
     <h3>🎓 إهداء</h3>
     <p>إلى مديرية التربية والتعليم لمنطقة الزرقاء الثانية — <span class="name">الأستاذ: عواد دحبور</span></p>
     <a href="https://wa.me/962788107669" target="_blank" class="btn-whatsapp">📞 +962 788107669</a>
   </div>
 
-  <!-- Loading -->
   <section class="panel loading" id="loadingPanel">
     <div class="spinner"></div>
     <p class="muted" id="loadingText">جارٍ تحضير التقرير...</p>
   </section>
 
-  <!-- Error -->
   <section class="panel hidden error-panel" id="errorPanel">
     <div class="icon">🔒</div>
     <h2>تعذّر فتح التقرير</h2>
@@ -244,7 +200,7 @@ body.embed-mode .panel { box-shadow: none; }
     </section>
     <div class="action-buttons no-print">
       <button class="primary" onclick="window.print()">🖨️ طباعة</button>
-      <button class="green" onclick="goExam()">✍️ بدء جلسة جديدة</button>
+      <button class="green" id="goExamBtn" onclick="goExam()">✍️ بدء جلسة جديدة</button>
     </div>
   </div>
 
@@ -372,7 +328,6 @@ body.embed-mode .panel { box-shadow: none; }
 
 <footer class="no-print">منصة تدريبية مستقلة مستلهمة من إطار TIMSS.</footer>
 
-<!-- المكتبات -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   if (typeof supabase === 'undefined') {
@@ -387,6 +342,12 @@ body.embed-mode .panel { box-shadow: none; }
 'use strict';
 const $ = id => document.getElementById(id);
 
+// ============================================================
+// 🔒 حماية: تسجيل الدخول إلزامي (أي دور)
+// ============================================================
+const __session = requireRole(['student', 'teacher', 'supervisor']);
+if (!__session) { throw new Error('redirecting'); }
+
 const state = {
   subject: null,
   subjectAr: null,
@@ -397,6 +358,60 @@ const state = {
   schoolId: null,
   section: null
 };
+
+// ============================================================
+// 🔒 دوال التحقق من الصلاحية
+// ============================================================
+async function verifyStudentAccess(studentRecord, sid) {
+  const s = __session;
+  if (s.role === 'student') {
+    if (String(s.data.national_id) !== String(sid)) {
+      throw new Error('غير مصرح لك بعرض تقرير طالب آخر.');
+    }
+    return;
+  }
+  if (s.role === 'teacher') {
+    if (String(s.data.school_id) !== String(studentRecord.school_id)) {
+      throw new Error('غير مصرح لك بعرض تقارير خارج مدرستك.');
+    }
+    return;
+  }
+  if (s.role === 'supervisor') {
+    const sch = await window.db.from('schools')
+      .select('directorate_id')
+      .eq('national_code', studentRecord.school_id)
+      .maybeSingle();
+    if (!sch.data || String(sch.data.directorate_id) !== String(s.data.directorate_id)) {
+      throw new Error('غير مصرح لك بعرض تقارير خارج مديريتك.');
+    }
+    return;
+  }
+  throw new Error('دور غير معروف.');
+}
+
+async function verifySchoolAccess(schoolId) {
+  const s = __session;
+  if (s.role === 'student') {
+    throw new Error('غير مصرح لك بعرض تقارير المدرسة أو الشعبة.');
+  }
+  if (s.role === 'teacher') {
+    if (String(s.data.school_id) !== String(schoolId)) {
+      throw new Error('غير مصرح لك بعرض تقارير خارج مدرستك.');
+    }
+    return;
+  }
+  if (s.role === 'supervisor') {
+    const sch = await window.db.from('schools')
+      .select('directorate_id')
+      .eq('national_code', schoolId)
+      .maybeSingle();
+    if (!sch.data || String(sch.data.directorate_id) !== String(s.data.directorate_id)) {
+      throw new Error('غير مصرح لك بعرض تقارير خارج مديريتك.');
+    }
+    return;
+  }
+  throw new Error('دور غير معروف.');
+}
 
 // ============================================================
 // التهيئة
@@ -474,6 +489,9 @@ async function loadStudentReport(sid, subject, attemptId) {
     if (!sRes.data) throw new Error('الطالب ' + sid + ' غير موجود.');
     state.student = sRes.data;
 
+    // 🔒 التحقق من الصلاحية
+    await verifyStudentAccess(sRes.data, sid);
+
     const rRes = await window.db.rpc('get_full_report', {
       p_student_id: sid,
       p_subject: subjectCode
@@ -504,6 +522,13 @@ function renderStudentReport(report, wrongQs) {
   $('repSubject').textContent = state.subjectAr;
   $('repDate').textContent = new Date().toLocaleString('ar-JO');
 
+  // 🔒 إخفاء زر "بدء جلسة جديدة" إن لم يكن المستخدم صاحب التقرير
+  if (__session.role !== 'student' ||
+      String(__session.data.national_id) !== String(state.student.national_id)) {
+    const btn = $('goExamBtn');
+    if (btn) btn.style.display = 'none';
+  }
+
   const total = Number(report.total_available || 0);
   const attempted = Number(report.attempted || 0);
   const correct = Number(report.correct || 0);
@@ -529,13 +554,11 @@ function renderStudentReport(report, wrongQs) {
       datasets: [{
         data: [correct, wrong, notAttempted],
         backgroundColor: ['#18845d', '#a52d37', '#cbd5e1'],
-        borderWidth: 2,
-        borderColor: '#fff'
+        borderWidth: 2, borderColor: '#fff'
       }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { position: 'bottom', labels: { font: { family: 'Cairo' } } },
         tooltip: { rtl: true }
@@ -580,8 +603,7 @@ function renderBarChart(key, canvasId, labels, correctData, wrongData) {
       ]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { position: 'bottom', labels: { font: { family: 'Cairo', size: 11 } } },
         tooltip: { rtl: true }
@@ -612,12 +634,19 @@ function renderWrongQs(items) {
 }
 
 // ============================================================
-// 👥 تقرير الشعبة — يدعم شعب متعددة
+// 👥 تقرير الشعبة
 // ============================================================
 async function loadSectionReport(schoolId, section, subject) {
   hideAll();
   $('loadingPanel').classList.remove('hidden');
   $('loadingText').textContent = 'جارٍ تحضير تقرير الشعبة...';
+
+  // 🔒 التحقق من الصلاحية
+  try {
+    await verifySchoolAccess(schoolId);
+  } catch (err) {
+    return showError(err.message || String(err));
+  }
 
   const subjectCode = subject === 'math' ? 'MATH' : 'SCI';
   const sectionList = (section || '').split(',').map(s => s.trim()).filter(s => s);
@@ -766,8 +795,7 @@ function renderHistogram(students) {
       datasets: [{ label: 'عدد الطلاب', data: counts, backgroundColor: '#2465a4', borderRadius: 6 }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { rtl: true } },
       scales: {
         y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Cairo' } } },
@@ -788,6 +816,13 @@ async function loadSchoolReport(schoolId, subject) {
   hideAll();
   $('loadingPanel').classList.remove('hidden');
   $('loadingText').textContent = 'جارٍ تحضير تقرير المدرسة...';
+
+  // 🔒 التحقق من الصلاحية
+  try {
+    await verifySchoolAccess(schoolId);
+  } catch (err) {
+    return showError(err.message || String(err));
+  }
 
   const subjectCode = subject === 'math' ? 'MATH' : 'SCI';
 
@@ -835,8 +870,7 @@ function renderSchoolReport(report) {
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { rtl: true } },
         scales: {
           y: { beginAtZero: true, ticks: { precision: 1, font: { family: 'Cairo' } } },
@@ -907,9 +941,16 @@ function esc(s) {
   }[c]));
 }
 function goExam() {
-  const sid = state.student ? state.student.national_id : '';
+  if (__session.role !== 'student') {
+    alert('هذا الخيار متاح للطلاب فقط.');
+    return;
+  }
+  if (!state.student || String(state.student.national_id) !== String(__session.data.national_id)) {
+    alert('لا يمكنك بدء امتحان من تقرير طالب آخر.');
+    return;
+  }
   const subj = state.subject || 'math';
-  window.location.href = 'exam.html?subject=' + subj + '&sid=' + sid;
+  window.location.href = 'exam.html?subject=' + subj;
 }
 
 init();
